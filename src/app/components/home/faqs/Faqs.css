@@ -1,0 +1,83 @@
+/* sección */
+
+.faq-section{
+  background-image: url('/images/Colores4.jpg');
+  background-color: rgba(255, 255, 255, 0.5);
+  background-blend-mode:lighten;
+}
+
+/* ancho como tailwind max-w-4xl */
+
+.faq-container{
+  max-width: 800px;
+}
+
+/* titulo */
+
+.faq-title{
+  font-family: var(--font-title);
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+/* item */
+
+.faq-item{
+  border-radius: 2rem !important;
+  overflow: hidden;
+  border: 1px solid transparent;
+  margin-bottom: 25px;
+  background: #f8f9fa;
+  transition: all .3s ease;
+}
+
+
+/* header */
+
+.faq-header button{
+  font-weight: 600;
+  font-size: 1.1rem;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* body */
+
+.faq-text{
+  color:#6c757d;
+}
+
+
+.faqAccordion .accordion-item {
+  background-color: #f1f5f9; /* gris claro */
+  border: none;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.dark .faqAccordion .accordion-item {
+  background-color: #27272a;
+}
+
+.faqAccordion .accordion-button {
+  background-color: transparent;
+  box-shadow: none;
+  border: none;
+  padding: 1.5rem;
+  font-weight: 600;
+}
+
+.faqAccordion .accordion-button:not(.collapsed) {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.faqAccordion .accordion-body {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  color: #64748b;
+}
+
+.dark .faqAccordion .accordion-body {
+  color: #94a3b8;
+}
+

@@ -1,0 +1,183 @@
+.footerSection {
+    background: #141e36;
+    color: white;
+    padding-top: 30px;
+    padding-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.footerContent {
+    position: relative;
+    z-index: 2;
+}
+
+.footerGrid {
+    margin-bottom: 30px;
+}
+
+.footerLogo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.footerLogoImg {
+    filter: brightness(0) invert(1);
+}
+
+.footerTitle {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.footerDescription {
+    color: #94a3b8;
+    max-width: 380px;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.footerSocial {
+    display: flex;
+    gap: 12px;
+}
+
+.socialCircle {
+    width: 48px;
+    height: 48px;
+    background: #1e293b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+}
+
+.socialCircle svg {
+    width: 22px;
+    height: 22px;
+    fill: white;
+}
+
+.socialCircle:hover {
+background: color-mix(in srgb, var(--color-primary) 50%, transparent);
+}
+
+.socialCircle.secondary:hover {
+    background: color-mix(in srgb, var(--color-secondary) 50%, transparent);
+}
+
+.socialCircle.tertiary:hover {
+    background: color-mix(in srgb, var(--color-tertiary) 50%, transparent);
+}
+
+.footerHeading {
+    font-size: 16px;
+    margin-bottom: 20px;
+    margin-top: 25px;
+}
+
+.footerLinks {
+    list-style: none;
+    padding: 0;
+}
+
+.footerLinks li {
+    margin-bottom: 10px;
+}
+
+.footerLinks a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: 0.3s;
+    font-size: 14px;
+}
+
+.footerLinks a:hover {
+    color: var(--color-primary);
+}
+
+.footerSmall {
+    color: #94a3b8;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.footerSubscribe {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.footerInput {
+    background: #1e293b;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+}
+
+.footerInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.footerButton {
+    background: var(--color-primary);
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: white;
+}
+
+.footerBottom {
+    border-top: 1px solid #1e293b;
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.footerLegal {
+    display: flex;
+    gap: 6px;
+}
+
+.footerLegal a {
+    color: rgb(231, 223, 223);
+}
+
+.footerLegal a:hover {
+    color: white;
+}
+
+/* blobs decorativos */
+
+.footerBlob1 {
+    position: absolute;
+    bottom: -80px;
+    right: -80px;
+    width: 320px;
+    height: 320px;
+    background: rgba(236, 72, 153, 0.1);
+    border-radius: 40%;
+    transform: rotate(12deg);
+}
+
+.footerBlob2 {
+    position: absolute;
+    top: -80px;
+    left: -80px;
+    width: 250px;
+    height: 250px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 50%;
+}

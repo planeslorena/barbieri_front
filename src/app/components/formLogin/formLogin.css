@@ -1,0 +1,45 @@
+/*Quita los botones de incremento y decremento del input tipo number*/
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    }
+input[type=number] { -moz-appearance:textfield; }
+
+.card-login {
+    background:    #e4f0fa;
+    border-radius: 32px;
+
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+.title {
+    font-family: var(--font-baloo);
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffcd64;
+    text-align: center;
+}
+
+.btn-dni {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-align: center;
+
+}
+
+.btn-dni:hover {
+    background-color: #e0e0e0;
+}
+
+.text-registrarse {
+    cursor: pointer;
+}
+
+.bi-arrow-left {
+    cursor: pointer;
+}
