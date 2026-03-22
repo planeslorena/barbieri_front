@@ -1,13 +1,10 @@
 :root {
-  --background: #fdf9f3;
+  --background: #faf8f5;
   --foreground: #263740;
-  --font-title: var(--font-fredoka);
-  --font-body: var(--font-quicksand);
+  --font-title: var(--font-cormorant);
+  --font-body: var(--font-montserrat);
   --font-color: #263740;
-  --color-primary: #ff6b6b;
-  --color-secondary: #4ecdc4;
-  --color-tertiary: #ffe66d;
-  --color-fourth: #6ecbff;
+  --color-primary: #a18d41;
 }
 
 body {
@@ -22,42 +19,25 @@ body {
   color: var(--color-primary);
 }
 
-.color-secondary {
-  color: var(--color-secondary);
+.section-bg {
+  background-color: rgb(232, 225, 213, .4) !important;
 }
 
-.color-tertiary {
-  color: var(--color-tertiary);
+.italic {
+  font-style: italic;
 }
 
-.color-fourth {
-  color: var(--color-fourth);
-}
-/*.title-name {
-  font-family: var(--font-categoria2);
-  font-weight: 400;
-  font-size: 1.8rem;
-  color: var(--font-color) !important;
-}
-
-.font-text {
-  font-family: var(--font-categoria2);
-  color: var(--font-color) !important;
-}*/
-
-.btn-style{
-  border-color:transparent !important;
-  --box-shadow: 2px 2px 10px #b3c2c8  !important;
+.btn-style {
+  border-color: transparent !important;
   font-family: var(--font-body) !important;
-  font-weight: 600;
+  font-weight: 500;
   color: white;
   margin: 4px;
-  padding:  7px 14px;
+  padding: 7px 25px;
   text-align: center;
   border-radius: 7px;
   font-size: 16px;
 }
-
 
 html,
 body {
@@ -65,18 +45,20 @@ body {
   overflow-x: hidden;
 }
 
-
-
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #191a1b;
+    --background: rgb(48, 48, 48);
     --foreground: #f2e0d5;
     --font-color: #f2e0d5;
-
   }
 }
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
+  }
+
+  .section-bg {
+    background-color: rgb(48, 48, 48, .2) !important;
   }
 }

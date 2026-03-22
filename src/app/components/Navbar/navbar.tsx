@@ -9,65 +9,33 @@ export function Menu() {
     const router = useRouter();
 
     return (
-        <>
-            <Navbar expand="lg" className="bg-light nav-bar px-5">
-                <Container fluid className="d-flex align-items-center">
-                    <Navbar.Brand >
-                        <img
-                            src="/images/logo2.jpg"
-                            className="img-fluid img-logo rounded-circle"
-                            alt="Logo Nene Kids"
-                            onClick={() => { router.push('/home') }}
-                        />
+        <Navbar expand="lg" className="nav-bar px-5">
+            <Container fluid className="d-flex align-items-center">
+                <Navbar.Brand >
+                    <img
+                        src="/images/logo.png"
+                        className="img-fluid img-logo"
+                        alt="Logo Florencia Barbieri"
+                        onClick={() => { router.push('/home') }}
+                    />
 
-                    </Navbar.Brand>
-                    <Nav className="nav-redes">
-                        <Nav.Link
-                            href="https://wa.me/5492284594159"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className='redes'
-                        >
-                            <i className="bi bi-whatsapp color-primary" />
-                        </Nav.Link>
-                        <Nav.Link
-                            href="https://www.instagram.com/pelu.nenekids"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className='redes'
-                        >
-                            <i className="bi bi-instagram color-secondary"></i>
-                        </Nav.Link>
-                        <Nav.Link
-                            href="https://maps.app.goo.gl/3FEqYAQxf9ehemuo7"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className='redes'
-                        >
-                            <i className="bi bi-geo-alt color-tertiary"></i>
-                        </Nav.Link>
+                </Navbar.Brand>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="mx-auto">
+                        <Nav.Link className="mx-2" onClick={() => { router.push('/home') }} >Inicio</Nav.Link>
+                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#servicios') }}>Tratamientos</Nav.Link>
+                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#sucursal') }}>Sobre mí</Nav.Link>
+                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#faqs') }}>Testimonios</Nav.Link>
+                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#faqs') }}>Contacto</Nav.Link>
                     </Nav>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="ms-auto">
-                            <Nav.Link className="mx-2" onClick={() => { router.push('/home') }} >Inicio</Nav.Link>
-                            <Nav.Link className="mx-2" onClick={() => { router.push('/home#servicios') }}>Servicios</Nav.Link>
-                            <Nav.Link className="mx-2" onClick={() => { router.push('/home#sucursal') }}>Nosotros</Nav.Link>
-                            <Nav.Link className="mx-2" onClick={() => { router.push('/home#faqs') }}>Preguntas Frecuentes</Nav.Link>
-                        </Nav>
-                        <i className="bi bi-heart-fill color-primary mx-2"></i>
-                        <button
-                            className="btn-style btn-iniciar-sesion mx-2"
-                            //onClick={() => { router.push('/client') }}
-                        >
-                            <a className="text-decoration-none text-white"  href="https://www.stt.com.ar/turnosNENEKIDS" target="_blank" rel="noopener noreferrer"> Reservar Turno</a>                          
-                        </button>
-                    </Navbar.Collapse>
-
-                </Container>
-            </Navbar >
-            <div className="rainbow-bg"></div>
-
-        </>
+                    <button
+                        className="btn-style btn-iniciar-sesion ms-auto mx-2"
+                    >
+                        <a className="text-decoration-none text-white" href="https://www.stt.com.ar/turnosNENEKIDS" target="_blank" rel="noopener noreferrer"> Agendar consulta</a>
+                    </button>
+                </Navbar.Collapse>
+            </Container>
+        </Navbar >
     );
 }

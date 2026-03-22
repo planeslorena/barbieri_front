@@ -1,238 +1,224 @@
-.hero-section {
-    padding-top: 70px;
+/* ===== GINECOLOGÍA HERO SECTION ===== */
+.hero-section-gineco {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 30px;
     padding-bottom: 40px;
 }
 
-/* Background pattern */
-.hero-pattern {
-    background-color: #fdf9f3;
-    background-image:
-        radial-gradient(#4ecdc4 0.5px, transparent 0.5px),
-        radial-gradient(#4ecdc4 0.5px, #fdf9f3 0.5px);
-    background-size: 20px 20px;
-    background-position: 0 0, 10px 10px;
-}
-
-/* Badge */
-.badge-hero {
-    background: white;
-    padding: 8px 16px;
+/* Badge - Ginecología */
+.badge-gineco {
+    padding: 3px 20px;
     border-radius: 50px;
+    border: 1px solid rgba(161, 141, 65, 0.2);
+    background-color: rgba(161, 141, 65, 0.1);
+    display: inline-flex;
 }
 
-
-.badge-text {
-    font-size: 0.75rem;
+.badge-gineco-text {
+    font-size: 0.70rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #6c757d;
+    letter-spacing: 1.5px;
+    color: var(--color-primary);
 }
 
-@media (prefers-color-scheme: dark) {
-    .badge-text {
-        color: #d1d5db;
-    }
-}
-
-/* Animación flotante suave */
-@keyframes floatY {
-    0% {
-        transform: translateY(0px);
-    }
-
-    50% {
-        transform: translateY(-8px);
-    }
-
-    100% {
-        transform: translateY(0px);
-    }
-}
-
-.floating-badge {
-    animation: floatY 1s ease-in-out infinite;
-}
-
-/* Title */
-.hero-title {
+/* Title - Ginecología */
+.hero-title-gineco {
     font-family: var(--font-title);
     font-size: clamp(2.5rem, 5vw, 4.5rem);
-    line-height: 1.2;
-    font-weight: 700;
+    font-weight: 600;
+    color: var(--font-color);
 }
 
-/* Description */
-.hero-description {
-    max-width: 500px;
-    color:#6c757d;
+/* Description - Ginecología */
+.hero-description-gineco {
+    color: #6c757d;
+    font-size: 1.1rem;
+    max-width: 550px;
 }
 
-/* Buttons */
-.btn-hero-primary {
-    background-color: var(--color-secondary);
+/* Buttons - Ginecología */
+.btn-gineco-primary {
+    background-color: var(--color-primary);
     color: white;
     padding: 14px 32px;
-    border-radius: 20px;
-    font-weight: 600;
+    border-radius: 9999px;
+    font-weight: 500;
     border: none;
-    transition: 0.3s ease;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(161, 141, 65, 0.2);
 }
 
-.btn-hero-primary:hover {
-    transform: scale(1.05);
-    background-color: var(--color-secondary);
+
+.btn-gineco-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(161, 141, 65, 0.3);
+    background-color: #8b7732;
 }
 
-.btn-hero-secondary {
-    background-color: white;
-    border: 2px solid #eee;
+.btn-gineco-secondary {
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 1px solid rgba(161, 141, 65, 0.3);
     padding: 14px 32px;
-    border-radius: 20px;
-    font-weight: 600;
-    transition: 0.3s ease;
+    border-radius: 9999px;
+    font-weight: 500;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-.btn-hero-secondary:hover {
-    background-color: #f8f9fa;
-    border: 2px solid #eee;
-    border-radius: 20px;
-    transform: scale(1.05);
-
+.btn-gineco-secondary:hover {
+    background-color: #f5f3f0;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-2px);
 
 }
 
-.bi-play-circle-fill {
-    font-size: 24px;
+/* Image - Ginecología */
+.organic-shape-decoration {
+    position: absolute;
+    top: -20px;
+    left: 40px;
+    width: 192px;
+    height: 192px;
+    background-color: rgba(161, 141, 65, 0.1);
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    z-index: -10;
 }
 
-/* Image */
-.hero-image-wrapper {
+.hero-image-gineco-wrapper {
     position: relative;
     background: white;
-    padding: 16px;
-    border-radius: 3rem;
-    transform: rotate(3deg);
-    transition: 0.5s ease;
-    width: 95%;
-    height: 95%;
-}
-
-.blob-shape-2 {
-    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-}
-
-.hero-image-wrapper:hover {
-    transform: rotate(0deg);
-}
-
-.hero-image {
-    border-radius: 2.5rem;
-    height: 500px;
-    object-fit: cover;
+    border-radius: 2rem;
+    max-width: 500px;
     width: 100%;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
 }
 
-.bi-scissors {
-    display: inline-block;
-    transform: rotate(90deg) !important;
-    font-size: 35px;
-    color: #f8f9fa;
+.hero-image-gineco {
+    border-radius: 1.5rem;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-/* Icon blob */
-.hero-icon {
+/* Info Card - Ginecología */
+.info-card-gineco {
     position: absolute;
-    top: -30px;
-    right: -30px;
-    background-color: var(--color-tertiary);
+    bottom: -15px;
+    left: 20px;
     padding: 20px;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(161, 141, 65, 0.1);
+    max-width: 300px;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.3);
 }
 
-/* Blob shape */
-.blob-shape {
-    border-radius: 60% 40% 60% 70% / 60% 30% 70% 40%;
-}
-
-/* Blur background */
-.hero-bg-blur {
-    position: absolute;
-    bottom: -50px;
-    left: -50px;
-    width: 200px;
-    height: 200px;
-    background: rgba(255, 107, 107, 0.15);
+.icon-circle {
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    filter: blur(60px);
-    z-index: -1;
+    background-color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+    font-size: 1.5rem;
 }
 
-/* Blob grande detrás de la imagen */
-.hero-blob-bg {
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    background-color: rgba(78, 205, 196, 0.15);
-    top: -7%;
-    left: -3%;
-}
-
-/* 🔹 Mobile */
-@media (max-width: 720px) {
-    .hero-section {
-        padding-top: 30px;
-        padding-bottom: 40px;
+/* Dark Mode - Ginecología */
+@media (prefers-color-scheme: dark) {
+    .badge-gineco {
+        background-color: #f2e0d5;
     }
 
+    .hero-description-gineco {
+        color: #a8a8a8;
+    }
+
+    .btn-gineco-secondary {
+        border-color: #444;
+        color: #f2e0d5;
+    }
+
+    .btn-gineco-secondary:hover {
+        background-color: #2d2d2d;
+        border-color: var(--color-primary);
+    }
+
+    .hero-image-gineco-wrapper {
+        background: #1e1e1e;
+    }
+
+    .info-card-gineco {
+        background: #2d2d2d;
+        border-color: rgba(161, 141, 65, 0.2);
+        color: #f2e0d5;
+    }
+
+    .info-card-gineco .text-muted {
+        color: #a8a8a8 !important;
+    }
 }
 
-/* Video modal */
-.video-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 1.5rem;
-}
+/* Responsive - Ginecología */
+@media (max-width: 768px) {
+    .hero-section-gineco {
+        padding-top: 10px;
+        padding-bottom: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+    }
 
-.video-modal {
-  position: relative;
-  width: min(900px, 100%);
-  max-height: 90vh;
-  background: #0f0f10;
-  border-radius: 1rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
-  overflow: hidden;
-}
+    .badge-gineco {
+        margin-left: 20px;
+    }
 
-.video-modal-player {
-  width: 100%;
-  height: 100%;
-  max-height: 80vh;
-  object-fit: contain;
-  background: black;
-}
+    .hero-title {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        width: 100%;
+        text-align: left;
+        margin-left: 20px;
+    }
 
-.video-modal-close {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  background: rgba(0,0,0,0.55);
-  border: none;
-  color: white;
-  font-size: 1.8rem;
-  line-height: 1;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  z-index: 10;
-}
+    .hero-description-gineco {
+        margin-left: 20px;
+    }
 
-.video-modal-close:hover {
-  background: rgba(0,0,0,0.85);
-  transform: scale(1.1);
+    .hero-image-gineco-wrapper {
+        max-width: 90%;
+    }
+
+    .organic-shape-decoration {
+        top: -25px;
+        left: 5%;
+
+    }
+
+    .info-card-gineco {
+        bottom: 20px;
+        left: 13%;
+        max-width: 320px;
+        padding: 16px;
+    }
+
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
 }
