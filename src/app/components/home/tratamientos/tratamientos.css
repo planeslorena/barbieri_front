@@ -1,0 +1,58 @@
+﻿#tratamientos {
+    background-color: var(--background);
+}
+
+.tratamiento-card {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(161, 141, 65, 0.2);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.tratamiento-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.13);
+    border-color: rgba(161, 141, 65, 0.35);
+}
+
+.icon-circle {
+    width: 64px;
+    height: 64px;
+    background-color: rgba(161, 141, 65, 0.1);
+    color: var(--color-primary);
+    border-radius: 16px;
+    transition: transform 0.25s ease;
+}
+
+.tratamiento-card:hover .icon-circle {
+    transform: scale(1.1);
+}
+
+.tratamiento-text {
+    line-height: 1.65;
+}
+
+.tratamiento-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: transform 0.25s ease;
+}
+
+.tratamiento-link:hover {
+    text-decoration: none;
+    transform: translateX(3px);
+}
+
+/* Clases anexas a globals.css */
+.text-primary {
+    color: var(--color-primary) !important;
+}
+
+.bg-background-dark\/50 {
+    background-color: rgba(48, 48, 48, 0.5) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    .tratamiento-card {
+        background-color: rgba(96, 95, 95, 0.2) !important;
+    }
+}

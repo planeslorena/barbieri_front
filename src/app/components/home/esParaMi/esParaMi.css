@@ -1,0 +1,122 @@
+.parami {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.ratio-3x4 {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: calc(100% * 4 / 3);
+}
+
+.ratio-3x4>* {
+    position: absolute;
+    inset: 0;
+}
+
+.ratio-1x1 {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 100%;
+}
+
+.ratio-1x1>* {
+    position: absolute;
+    inset: 0;
+}
+
+.esParaMi-card {
+    border-radius: 1rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    color: var(--foreground);
+}
+
+.esParaMi-list-item {
+    border: 1px solid rgba(161, 141, 65, 0.15);
+    transition: border-color 0.25s ease, transform 0.2s ease;
+}
+
+.esParaMi-list-item:hover {
+    border-color: rgba(161, 141, 65, 0.35);
+    transform: translateX(2px);
+    background-color: rgba(255, 255, 255, 0.65);
+}
+
+.esParaMi-item-1 {
+    margin-top: -2.5rem;
+    z-index: 2;
+}
+
+.esParaMi-item-2 {
+    margin-top: 0;
+}
+
+.esParaMi-item-3 {
+    margin-top: -7.5rem;
+}
+
+.esParaMi-item-4 {
+    margin-top: 0;
+}
+
+.esParaMi-image {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+
+.esParaMi-image:hover {
+    transform: scale(1.03);
+}
+
+.text-primary {
+    color: var(--color-primary) !important;
+}
+
+.font-serif {
+    font-family: var(--font-title), serif !important;
+}
+
+.bg-accent-soft {
+    background: rgba(219, 228, 247, 0.35);
+}
+
+.dark .bg-white-5 {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.organic-shape {
+    position: absolute;
+    top: -1.5rem;
+    right: -1.5rem;
+    width: 10rem;
+    height: 10rem;
+    background: rgba(161, 141, 65, 0.15);
+    border-radius: 60% 40% 55% 45% / 40% 60% 45% 55%;
+    z-index: 1;
+}
+
+.icon-list {
+    font-size: 1.5rem;
+}
+
+@media (max-width: 992px) {
+    .organic-shape {
+        width: 8rem;
+        height: 8rem;
+        top: -1rem;
+        right: -1rem
+    }
+
+    .esParaMi-item-3 {
+        margin-top: -5rem;
+    }
+
+    .parami {
+        width: 90%;
+        margin: 0 auto;
+    }
+}

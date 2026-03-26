@@ -24,7 +24,7 @@ export function Menu() {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="mx-auto">
                         <Nav.Link className="mx-2" onClick={() => { router.push('/home') }} >Inicio</Nav.Link>
-                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#servicios') }}>Tratamientos</Nav.Link>
+                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#tratamientos') }}>Tratamientos</Nav.Link>
                         <Nav.Link className="mx-2" onClick={() => { router.push('/home#sucursal') }}>Sobre mí</Nav.Link>
                         <Nav.Link className="mx-2" onClick={() => { router.push('/home#faqs') }}>Testimonios</Nav.Link>
                         <Nav.Link className="mx-2" onClick={() => { router.push('/home#faqs') }}>Contacto</Nav.Link>

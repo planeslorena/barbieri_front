@@ -1,6 +1,6 @@
 :root {
   --background: #faf8f5;
-  --foreground: #263740;
+  --foreground:  #6c757d;;
   --font-title: var(--font-cormorant);
   --font-body: var(--font-montserrat);
   --font-color: #263740;
@@ -23,8 +23,11 @@ body {
   background-color: rgb(232, 225, 213, .4) !important;
 }
 
-.italic {
-  font-style: italic;
+.title {
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 4vw, 4rem);
+  font-weight: 600;
+  color: var(--font-color);
 }
 
 .btn-style {
@@ -58,7 +61,11 @@ body {
     color-scheme: dark;
   }
 
+  body{
+    color: var(--font-color) !important;
+  }
+
   .section-bg {
-    background-color: rgb(48, 48, 48, .2) !important;
+    background-color: rgba(81, 80, 80, 0.2) !important;
   }
 }
