@@ -1,0 +1,110 @@
+/* HERO */
+.hero-tratamiento {
+    height: 40vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.40), rgba(0, 0, 0, 0.40)),
+        url('/images/tratamientos.jpg') center/cover no-repeat;
+}
+
+.hero-title {
+    color: white;
+}
+
+.section-light {
+    background-color: white !important;
+}
+
+
+.secciones-tto {
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+/* TARJETAS */
+.tto-card {
+    padding: 28px;
+    border-radius: 16px;
+    border: none;
+    background: white;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.tratamiento-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* TITULOS */
+h2 {
+    font-weight: 600;
+}
+
+/* CTA */
+.btn-ttos {
+    padding: 0.8rem 1.8rem;
+    background-color: var(--color-primary);
+    border-radius: 30px;
+    font-size: 1.2rem;
+}
+
+/* NAV ANCLAS */
+.anchor-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid white;
+    transition: all 0.3s ease;
+}
+
+.anchor-link:hover {
+    transform: translateY(-3px);
+}
+
+/* SCROLL SUAVE */
+html {
+    scroll-behavior: smooth;
+}
+
+.symptoms-box {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid var(--color-primary);
+}
+
+.text-body-secondary {
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+@media (max-width: 768px) {
+    .tratamiento-card {
+        padding: 1rem;
+    }
+
+    .secciones-tto {
+        padding-top: 60px;
+        padding-bottom: 60px;
+    }
+}
+
+/* DARK MODE */
+@media (prefers-color-scheme: dark) {
+    .section-light {
+        background-color: rgb(66, 66, 66) !important;
+    }
+
+    .tto-card {
+        background-color: rgba(96, 95, 95)
+    }
+
+    .symptoms-box {
+        background-color: rgba(96, 95, 95)
+    }
+
+    .text-body-secondary{
+        color: var(--font-color) !important
+    }
+}

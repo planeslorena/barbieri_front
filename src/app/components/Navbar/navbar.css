@@ -80,6 +80,20 @@
         margin-left: 5 !important;
         margin-right: 0 !important;
     }
+
+    .dropdown-menu {
+        right: 0;
+        left: auto;
+        text-align: right;
+        width: auto;
+    }
+
+    .dropdown-item {
+        display: inline-block;
+        width: auto;
+        text-align: right;
+    }
+
 }
 
 @media (prefers-color-scheme: dark) {

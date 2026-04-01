@@ -1,6 +1,5 @@
 .footerSection {
-    background: #141e36;
-    color: white;
+    background: #E8E1D5;
     padding-top: 30px;
     padding-bottom: 10px;
     position: relative;
@@ -49,7 +48,7 @@
 .socialCircle {
     width: 48px;
     height: 48px;
-    background: #1e293b;
+    background: #faf8f5;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -57,23 +56,10 @@
     transition: 0.3s;
 }
 
-.socialCircle svg {
-    width: 22px;
-    height: 22px;
-    fill: white;
-}
-
 .socialCircle:hover {
-background: color-mix(in srgb, var(--color-primary) 50%, transparent);
+    background: color-mix(in srgb, var(--color-primary) 50%, transparent);
 }
 
-.socialCircle.secondary:hover {
-    background: color-mix(in srgb, var(--color-secondary) 50%, transparent);
-}
-
-.socialCircle.tertiary:hover {
-    background: color-mix(in srgb, var(--color-tertiary) 50%, transparent);
-}
 
 .footerHeading {
     font-size: 16px;
@@ -91,7 +77,7 @@ background: color-mix(in srgb, var(--color-primary) 50%, transparent);
 }
 
 .footerLinks a {
-    color: #94a3b8;
+    color: var(--font-color);
     text-decoration: none;
     transition: 0.3s;
     font-size: 14px;
@@ -147,37 +133,33 @@ background: color-mix(in srgb, var(--color-primary) 50%, transparent);
 }
 
 .footerLegal {
-    display: flex;
     gap: 6px;
 }
 
-.footerLegal a {
-    color: rgb(231, 223, 223);
-}
 
 .footerLegal a:hover {
     color: white;
 }
 
-/* blobs decorativos */
-
-.footerBlob1 {
-    position: absolute;
-    bottom: -80px;
-    right: -80px;
-    width: 320px;
-    height: 320px;
-    background: rgba(236, 72, 153, 0.1);
-    border-radius: 40%;
-    transform: rotate(12deg);
+/* DARK MODE */
+@media (prefers-color-scheme: dark) {
+    .footerSection {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
 }
 
-.footerBlob2 {
-    position: absolute;
-    top: -80px;
-    left: -80px;
-    width: 250px;
-    height: 250px;
-    background: rgba(59, 130, 246, 0.1);
-    border-radius: 50%;
+/*MOBILE*/
+@media (max-width: 768px) {
+    .footerGrid {
+        padding-left: 1rem;
+    }
+
+    .footerBottom{
+        padding-left: 1rem;
+        text-align: center;
+    }
+
+    .footerLegal{
+        width: 100%;
+    }
 }

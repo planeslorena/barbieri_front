@@ -4,6 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
 import './navbar.css';
 import { useRouter } from 'next/navigation';
+import { NavDropdown } from 'react-bootstrap';
 
 export function Menu() {
     const router = useRouter();
@@ -24,15 +25,24 @@ export function Menu() {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="mx-auto">
                         <Nav.Link className="mx-2" onClick={() => { router.push('/home') }} >Inicio</Nav.Link>
-                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#tratamientos') }}>Tratamientos</Nav.Link>
-                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#sucursal') }}>Sobre mí</Nav.Link>
-                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#faqs') }}>Testimonios</Nav.Link>
-                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#faqs') }}>Contacto</Nav.Link>
+                        <NavDropdown className="mx-2" title="Tratamientos" id="basic-nav-dropdown">
+                            <NavDropdown.Item href="/tratamientos#ginecologia">Ginecologia Funcional</NavDropdown.Item>
+                            <NavDropdown.Item href="/tratamientos#incontinencia">
+                                Incontinencia de Orina
+                            </NavDropdown.Item>
+                            <NavDropdown.Item href="/tratamientos#sequedad">Sequedad Vaginal</NavDropdown.Item>
+                            <NavDropdown.Item href="/tratamientos#rejuvenecimiento">
+                                Rejuvenecimiento Vaginal
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#sobre-mi') }}>Sobre mí</Nav.Link>
+                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#testimonios') }}>Testimonios</Nav.Link>
+                        <Nav.Link className="mx-2" onClick={() => { router.push('/home#contacto') }}>Contacto</Nav.Link>
                     </Nav>
                     <button
                         className="btn-style btn-iniciar-sesion ms-auto mx-2"
                     >
-                        <a className="text-decoration-none text-white" href="https://www.stt.com.ar/turnosNENEKIDS" target="_blank" rel="noopener noreferrer"> Agendar consulta</a>
+                        <a className="text-decoration-none text-white" href="https://miomedicina.sc3-server3.com.ar/miturno" target="_blank" rel="noopener noreferrer"> Agendar consulta</a>
                     </button>
                 </Navbar.Collapse>
             </Container>

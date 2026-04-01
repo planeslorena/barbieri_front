@@ -4,20 +4,23 @@ const treatments = [
   {
     title: 'Ginecología Funcional',
     icon: 'utero',
+    saber_mas: 'ginecologia',
     description:
-      'Buscamos el equilibrio hormonal y el bienestar desde la raíz, tratando no solo los síntomas sino las causas.',
+      'En cada consulta, buscamos juntas el porqué detrás de los síntomas, identificamos causas reales y diseñamos un abordaje que acompañe cada etapa de tu vida.',
   },
   {
-    title: 'Tecnología Láser',
+    title: 'Incontinencia de Orina',
     icon: 'laser',
+    saber_mas: 'incontinencia',
     description:
-      'Tratamientos mínimamente invasivos para regeneración, tensado vaginal y salud íntima sin cirugía.',
+      'Tratamientos no invasivos para regeneración, tensado vaginal y salud íntima, sin cirugía. Evaluamos tu caso y elegimos juntas la mejor opción: láser vaginal o Dr. Arnold.',
   },
   {
-    title: 'Salud Pélvica',
+    title: 'Salud Intima en la Menopausia',
     icon: 'meditacion',
+    saber_mas: 'sequedad',
     description:
-      'Fortalecimiento y recuperación del suelo pélvico para mejorar tu calidad de vida diaria.',
+      'Tratamientos personalizados que mejoran la hidratación, elasticidad y bienestar íntimo. Desde terapias locales y ácido hialurónico hasta tecnología láser avanzada.',
   },
 ];
 
@@ -27,8 +30,8 @@ export default function Tratamientos() {
       <div className="container px-3 px-lg-5">
         <div className="text-center mx-auto mb-5" style={{ maxWidth: '50rem' }}>
           <h2 className="text-primary fw-bold text-uppercase small tracking-widest mb-2">Especialidades</h2>
-          <h3 className="title mb-3">Nuestros Tratamientos</h3>
-          <p className="text-secondary mb-0">Ofrecemos soluciones avanzadas utilizando la última tecnología y un enfoque funcional para tu salud.</p>
+          <h3 className="title mb-3">Tratamientos</h3>
+          <p className="text-secondary mb-0">Soluciones avanzadas utilizando la última tecnología y un enfoque funcional para tu salud.</p>
         </div>
 
         <div className="row g-4">
@@ -41,7 +44,7 @@ export default function Tratamientos() {
                 </div>
                 <h4 className="fs-5 fw-bold mb-3">{treatment.title}</h4>
                 <p className="mb-4 tratamiento-text">{treatment.description}</p>
-                <a href="#" className="tratamiento-link fw-bold d-inline-flex align-items-center gap-1">
+                <a href={`/tratamientos#${treatment.saber_mas}`} className="tratamiento-link fw-bold d-inline-flex align-items-center gap-1">
                   Saber más
                   <i className="bi bi-arrow-right"></i>
                 </a>

@@ -6,9 +6,9 @@ const SobreMi = () => {
         <section className="overflow-hidden section-sobre-mi" id="sobre-mi">
             <div className="d-flex flex-column flex-lg-row gap-16 align-items-center">
                 {/* IMAGEN SOLO VISIBLE EN DESKTOP */}
-                <div className="d-none d-md-block w-100 w-lg-50 position-relative">
+                <div className="d-none d-md-block w-lg-50 mx-auto">
                     <img
-                        className="rounded-2rem position-relative z-10 w-100 object-fit-cover"
+                        className="rounded-2rem z-10 w-100 "
                         alt="Dra. Barbieri Florencia"
                         src="/images/sobre_mi_desktop.jpg"
                     />

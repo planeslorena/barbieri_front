@@ -49,11 +49,6 @@
     height: 10rem;
 }
 
-.bg-sand {
-    background-color: #e6d7c3;
-    /* Assuming sand color */
-}
-
 .mix-blend-multiply {
     mix-blend-mode: multiply;
 }
@@ -133,11 +128,10 @@
         background-color: #FFFFFF;
         border-radius: 1rem;
     }
-}
-
-@media (prefers-color-scheme: dark) {
+    @media (prefers-color-scheme: dark) {
     .section-sobre-mi {
         background-color: rgba(255, 255, 255, 0.05) !important;
-
     }
 }
+}
+

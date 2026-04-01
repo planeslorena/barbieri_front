@@ -18,6 +18,15 @@ export default function EsParaMi() {
 
                     <div className="col-lg-6">
                         <h2 className="title color-primary mb-4 position-relative">¿Es para mí?</h2>
+                        <p className="section-intro">
+                            La salud íntima también es parte de tu bienestar, aunque muchas veces no se hable.
+                            Escuchar los cambios en tu cuerpo a tiempo permite acompañarlos de forma más simple,
+                            preventiva y respetuosa.
+                        </p>
+                        <p className="section-intro">
+                            La ginecología funcional y regenerativa ofrece un enfoque integral, pensado para
+                            entender el origen de lo que te pasa y acompañarte con opciones personalizadas.
+                        </p>
                         <p className=" mb-4 ">
                             Ideal para acompañarte en situaciones como:
                         </p>

@@ -3,6 +3,11 @@
     margin: 0 auto;
 }
 
+.section-intro {
+
+  line-height: 1.6;
+}
+
 .ratio-3x4 {
     position: relative;
     width: 100%;

@@ -1,0 +1,44 @@
+.testimonio-card {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(200, 180, 140, 0.2);
+  position: relative;
+  height: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.quote-icon {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 60px;
+  color: rgba(161, 141, 65, 0.2);
+}
+
+.stars span {
+  font-size: 20px;
+}
+
+.testimonio-text {
+  color: #6c757d;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.testimonio-author {
+  font-weight: bold;
+  color: var(--font-color);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .testimonio-card {
+    background-color: #2d2d2d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .testimonio-text {
+    color: #ccc;
+  }
+}
