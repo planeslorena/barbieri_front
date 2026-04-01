@@ -122,7 +122,7 @@ export default function TratamientosPage() {
             {/* HERO */}
             <section className="hero-tratamiento d-flex align-items-center text-white">
                 <div className="container text-center">
-                    <h1 className="title hero-title">Tratamientos</h1>
+                    <h1 className="title tto-title">Tratamientos</h1>
 
                     {/* NAV INTERNO */}
                     <div className="mt-4 d-flex flex-wrap justify-content-center gap-3">
@@ -142,7 +142,7 @@ export default function TratamientosPage() {
                     id={t.id}
                     className={`secciones-tto ${index % 2 === 0 ? "section-light" : ""}`}
                 >
-                    <div className="container px-5">
+                    <div className="container px-5 container-tto">
                         <h2 className="mb-3 color-primary">{t.titulo}</h2>
 
                         <div className="row g-5 align-items-start">

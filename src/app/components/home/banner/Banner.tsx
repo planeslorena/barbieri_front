@@ -62,7 +62,7 @@ export default function Banner() {
 
             <div className="info-card-gineco shadow">
               <div className="d-flex align-items-center gap-3 mb-2">
-                <i className="bi bi-check-circle-fill color-primary icon-circle"></i>
+                <i className="bi bi-check-circle-fill color-primary fondo-icono"></i>
                 <span className="fw-bold">Atención Personalizada</span>
               </div>
               <p className="text-muted small mb-0">Escuchar, comprender y acompañar a cada mujer desde una mirada integral.</p>
