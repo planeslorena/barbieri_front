@@ -27,7 +27,7 @@ const SobreMi = () => {
                         </div>
                     </div>
                     <p className="fs-4 font-serif fst-italic text-slate-500">Especialista en Ginecología Funcional y Regenerativa</p>
-                    <div className="space-y-4 text-slate-600 dark-text-slate-400 fs-5 leading-relaxed">
+                    <div className="leading-relaxed">
                         <p>Con más de 12 años de experiencia, mi misión ha sido transformar la consulta ginecológica tradicional en una experiencia de escucha activa y bienestar real.</p>
                         <p>Me especializo en el uso de tecnologías láser de vanguardia y en el estudio hormonal profundo, permitiendo que cada mujer recupere su confianza y vitalidad en cada etapa, desde la juventud hasta la menopausia.</p>
                     </div>

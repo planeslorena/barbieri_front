@@ -1,16 +1,5 @@
-'use client';
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import HomePage from "./(pages)/home/page";
 
-
-export default function Home() {
-  const router = useRouter();
-  useEffect(() => {
-    router.push("/home");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return (
-    <></>
-  );
+export default function Page() {
+  return <HomePage />;
 }
