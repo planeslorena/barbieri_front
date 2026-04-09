@@ -40,13 +40,17 @@ export default function Contacto() {
                 <h4 className="mb-3">Horario de Atención</h4>
 
                 <div className="horario-item">
-                  <span>Lunes a Viernes</span>
-                  <span>09:00 - 19:00</span>
+                  <span>Lunes a Miercoles</span>
+                  <span>09:00 - 17:00</span>
                 </div>
 
                 <div className="horario-item">
-                  <span>Sábados</span>
-                  <span>10:00 - 14:00</span>
+                  <span>Jueves</span>
+                  <span>09:00 - 16:00</span>
+                </div>
+                <div className="horario-item">
+                  <span>Viernes</span>
+                  <span>09:00 - 12:00</span>
                 </div>
               </div>
             </div>

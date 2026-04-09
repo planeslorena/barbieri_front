@@ -28,18 +28,10 @@ const SobreMi = () => {
                     </div>
                     <p className="fs-4 font-serif fst-italic text-slate-500">Especialista en Ginecología Funcional y Regenerativa</p>
                     <div className="leading-relaxed">
-                        <p>Con más de 12 años de experiencia, mi misión ha sido transformar la consulta ginecológica tradicional en una experiencia de escucha activa y bienestar real.</p>
-                        <p>Me especializo en el uso de tecnologías láser de vanguardia y en el estudio hormonal profundo, permitiendo que cada mujer recupere su confianza y vitalidad en cada etapa, desde la juventud hasta la menopausia.</p>
-                    </div>
-                    <div className="row justify-content-center gap-2 pt-3">
-                        <div className="col-5">
-                            <div className="fs-2 fw-bold text-primary">12+</div>
-                            <div className="datos text-uppercase">Años exp.</div>
-                        </div>
-                        <div className="col-5">
-                            <div className="fs-2 fw-bold text-primary">5k+</div>
-                            <div className="datos text-uppercase">Pacientes</div>
-                        </div>
+                        <p>Soy médica especialista en Ginecología y Obstetricia, con una trayectoria orientada a la evolución constante de la salud femenina y al abordaje integral de cada etapa de la vida de la mujer.</p>
+                        <p>Mi camino hacia la ginecología funcional, regenerativa y estética surgió de la escucha activa de mis pacientes: mujeres que atravesaban cambios hormonales, síntomas persistentes, alteraciones en su bienestar íntimo y sexual, o etapas de transición en las que muchas veces no encontraban respuestas satisfactorias dentro de la medicina tradicional.</p>
+                        <p>Esa necesidad creciente me impulsó a realizar una formación profunda y continua en terapias regenerativas, medicina funcional y tecnologías avanzadas aplicadas a la ginecología, incorporando herramientas innovadoras que me permiten ofrecer tratamientos personalizados, seguros y enfocados en mejorar la calidad de vida.</p>
+                        <p>Hoy, mi propósito es acompañar a cada mujer con una mirada médica cercana, científica y humana, ayudándola a recuperar equilibrio, bienestar, vitalidad y confianza en cada etapa de su vida.</p>
                     </div>
                 </div>
             </div>
