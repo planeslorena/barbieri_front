@@ -23,7 +23,7 @@ const SobreMi = () => {
                         />
                         <div className="d-flex flex-column">
                             <h2 className="text-primary fw-bold tracking-widest text-uppercase fs-6">Sobre mí</h2>
-                            <h3 className="title">Dra. Barbieri Florencia</h3>
+                            <h3 className="title">Dra. Florencia Barbieri</h3>
                         </div>
                     </div>
                     <p className="fs-4 font-serif fst-italic text-slate-500">Especialista en Ginecología Funcional y Regenerativa</p>
