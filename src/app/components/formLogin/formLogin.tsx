@@ -77,12 +77,14 @@ export default function FormLogin(props: any) {
 
 
     return (
-        <div className="card-login d-flex flex-column align-items-center justify-content-center w-100">
-            <h4 className="title">Inicía sesión</h4>
-            <img src="/images/logo.jpg" alt="Logo Nene Kids" className="img-fluid h-25 mb-3" />
-            <form onSubmit={handleSubmit(onSubmit)} className="d-flex flex-column my-3 d-grid gap-2 col-8 mx-auto">
+        <div className="card-login d-flex flex-column align-items-center justify-content-center w-100 shadow">
+            <span className="login-eyebrow">Acceso usuarios</span>
+            <h4 className="title">Iniciar sesión</h4>
+            <p className="login-subtitle">Ingresá para gestionar tus turnos y continuar con tu seguimiento.</p>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="login-form d-flex flex-column my-3 d-grid gap-2 col-8 mx-auto">
                 {!pedirCodigo && (
-                    <input placeholder="DNI" type="number" className="rounded p-1 btn-dni"
+                    <input placeholder="DNI" type="number" className="btn-dni"
                         {...register("dni", {
                             required: "Por favor ingrese su DNI",
                             minLength: { value: 6, message: "Ingrese un numero de DNI valido" },
@@ -94,17 +96,17 @@ export default function FormLogin(props: any) {
                     <input
                         placeholder="Código de acceso"
                         type="password"
-                        className="rounded p-1 btn-dni"
+                        className="btn-dni"
                         {...register("codigo", {
                             required: "Ingrese el código",
                         })}
                     />
                 )}
-                {errors.dni && <small className="fw-light">{errors.dni?.message}</small>}
-                {errors.codigo && <small className="fw-light">{errors.codigo?.message}</small>}
+                {errors.dni && <small className="login-error">{errors.dni?.message}</small>}
+                {errors.codigo && <small className="login-error">{errors.codigo?.message}</small>}
 
-                <button type="submit" className="btn-style rounded p-1" >Ingresar</button>
-                <small className="font-text text-registrarse" onClick={() => mostrarFormRegistrarse()}>
+                <button type="submit" className="btn-style login-submit-btn" >Ingresar</button>
+                <small className="text-registrarse" onClick={() => mostrarFormRegistrarse()}>
                     <u className="text-registrarse">Aún no tenes una cuenta? Registrate</u>
                 </small>
             </form>
