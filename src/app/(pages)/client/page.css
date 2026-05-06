@@ -1,0 +1,500 @@
+.client-turnos-page {
+  min-height: 100vh;
+  padding: 1.5rem 0 3rem;
+  background: var(--background);
+}
+
+.turnos-card {
+  width: min(100%, 40rem);
+  margin: 0 auto;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border: 1px solid rgba(161, 141, 65, 0.18);
+  border-radius: 2rem;
+  background:
+    radial-gradient(circle at top left, rgba(161, 141, 65, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 248, 245, 0.98) 100%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.08);
+}
+
+.mis-turnos-card {
+  position: relative;
+  width: min(100%, 40rem);
+  margin: 0 auto 1.25rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid rgba(161, 141, 65, 0.18);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.06);
+}
+
+.mis-turnos-heading {
+  margin-bottom: 1.35rem;
+}
+
+.mis-turnos-actions {
+  display: block;
+  margin-bottom: 1.35rem;
+}
+
+.turnos-refresh-btn {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 0;
+  border-radius: 50%;
+  background-color: rgba(161, 141, 65, 0.1);
+  color: var(--color-primary);
+}
+
+.mis-turnos-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.mis-turnos-item {
+  display: grid;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(161, 141, 65, 0.14);
+  border-radius: 1rem;
+  background-color: rgba(250, 248, 245, 0.82);
+}
+
+.mis-turnos-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.mis-turnos-item strong,
+.mis-turnos-item span {
+  display: block;
+}
+
+.mis-turnos-item strong {
+  color: var(--font-color);
+}
+
+.mis-turnos-item span {
+  color: #6c757d;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.mis-turnos-date {
+  min-width: 8.5rem;
+  text-align: right;
+}
+
+.mis-turnos-new-btn {
+  margin: 0;
+}
+
+.mis-turnos-cancel-btn {
+  width: fit-content;
+  min-height: 2.35rem;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid rgba(156, 75, 73, 0.3);
+  border-radius: 999px;
+  background-color: rgba(156, 75, 73, 0.08);
+  color: #9c4b49;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.mis-turnos-cancel-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.turnos-step {
+  width: 100%;
+}
+
+.turnos-heading {
+  margin-bottom: 1.15rem;
+  text-align: center;
+}
+
+.turnos-heading .title {
+  margin-bottom: 0.5rem;
+  font-size: clamp(1.65rem, 4vw, 2.45rem);
+  line-height: 1.05;
+}
+
+.turnos-heading p {
+  max-width: 30rem;
+  margin: 0 auto;
+  color: #6c757d;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.turnos-eyebrow {
+  display: inline-flex;
+  margin-bottom: 0.55rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid rgba(161, 141, 65, 0.16);
+  border-radius: 999px;
+  background-color: rgba(161, 141, 65, 0.08);
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.turnos-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.turnos-option,
+.turnos-hour,
+.turnos-day,
+.turnos-icon-btn,
+.turnos-back {
+  border: 0;
+  font: inherit;
+}
+
+.turnos-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 4.35rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(161, 141, 65, 0.18);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--font-color);
+  text-align: left;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.turnos-option:hover {
+  transform: translateY(-2px);
+  border-color: rgba(161, 141, 65, 0.38);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+}
+
+.turnos-option strong,
+.turnos-option small {
+  display: block;
+}
+
+.turnos-option small {
+  margin-top: 0.3rem;
+  color: #7d786f;
+}
+
+.turnos-option i {
+  color: var(--color-primary);
+  font-size: 1.6rem;
+}
+
+.turnos-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+  padding: 0.45rem 0;
+  background: transparent;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.turnos-top-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.turnos-top-actions .turnos-back {
+  margin-bottom: 0;
+}
+
+.turnos-back-home {
+  margin-left: auto;
+}
+
+.turnos-state {
+  margin: 1.5rem auto;
+  color: #6c757d;
+  text-align: center;
+}
+
+.turnos-primary-btn {
+  width: 100%;
+  min-height: 3.3rem;
+  margin: 1rem 0 0;
+  border-radius: 999px !important;
+  background-color: var(--color-primary);
+  box-shadow: 0 12px 24px rgba(161, 141, 65, 0.24);
+}
+
+.turnos-primary-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.turnos-calendar {
+  width: min(100%, 27rem);
+  margin: 0 auto;
+}
+
+.turnos-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  color: var(--font-color);
+  text-transform: capitalize;
+}
+
+.turnos-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background-color: rgba(161, 141, 65, 0.1);
+  color: var(--color-primary);
+}
+
+.turnos-icon-btn:disabled {
+  color: #bcb6aa;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.turnos-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.turnos-weekdays {
+  margin-bottom: 0.35rem;
+  color: #8b8579;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.turnos-day {
+  aspect-ratio: 1;
+  border-radius: 0.65rem;
+  background-color: rgba(161, 141, 65, 0.12);
+  color: var(--font-color);
+  font-weight: 600;
+  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.turnos-day:hover,
+.turnos-day.is-selected {
+  transform: translateY(-1px);
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.turnos-day:disabled {
+  transform: none;
+  background-color: rgba(150, 145, 136, 0.08);
+  color: #c4beb4;
+  cursor: not-allowed;
+}
+
+.turnos-hours {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+  gap: 0.6rem;
+}
+
+.turnos-hour {
+  min-height: 2.9rem;
+  border: 1px solid rgba(161, 141, 65, 0.22);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.88);
+  color: var(--font-color);
+  font-weight: 600;
+}
+
+.turnos-hour:hover,
+.turnos-hour.is-selected {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.turnos-summary {
+  margin-bottom: 1.25rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(161, 141, 65, 0.16);
+  border-radius: 1rem;
+  background-color: rgba(161, 141, 65, 0.07);
+}
+
+.turnos-summary span {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.turnos-summary p {
+  margin: 0.15rem 0;
+  color: var(--font-color);
+  font-size: 0.95rem;
+}
+
+.turnos-confirm-card {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background-color: rgba(255, 255, 255, 0.84);
+}
+
+.turnos-confirm-card p {
+  margin-bottom: 0.45rem;
+  color: var(--font-color);
+}
+
+.turnos-payment-note {
+  margin-bottom: 1rem;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid rgba(161, 141, 65, 0.22);
+  border-radius: 1rem;
+  background-color: rgba(161, 141, 65, 0.09);
+  color: var(--font-color);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.turnos-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--font-color);
+  font-weight: 600;
+}
+
+.turnos-textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(161, 141, 65, 0.24);
+  border-radius: 1rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--font-color);
+}
+
+.turnos-textarea:focus {
+  outline: none;
+  border-color: rgba(161, 141, 65, 0.58);
+  box-shadow: 0 0 0 0.25rem rgba(161, 141, 65, 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+
+  .turnos-card,
+  .mis-turnos-card,
+  .mis-turnos-item,
+  .turnos-option,
+  .turnos-hour,
+  .turnos-confirm-card,
+  .turnos-textarea {
+    border-color: rgba(161, 141, 65, 0.24);
+    background:
+      radial-gradient(circle at top left, rgba(161, 141, 65, 0.12), transparent 34%),
+      linear-gradient(180deg, rgba(54, 53, 51, 0.9) 0%, rgba(40, 40, 40, 0.94) 100%);
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.28),
+      0 10px 24px rgba(161, 141, 65, 0.08);
+  }
+
+  .turnos-heading p,
+  .mis-turnos-item span,
+  .turnos-option small,
+  .turnos-state {
+    color: #d7d0c7;
+  }
+
+  .turnos-textarea {
+    color: #f2e0d5;
+  }
+
+  .turnos-day {
+    background-color: rgba(157, 147, 107);
+  }
+}
+
+@media (max-width: 576px) {
+  .client-turnos-page {
+    padding-top: 0.75rem;
+  }
+
+  .turnos-card {
+    border-radius: 1.35rem;
+    padding: 1rem;
+  }
+
+  .mis-turnos-card {
+    border-radius: 1.25rem;
+    padding: 1rem;
+  }
+
+  .mis-turnos-actions {
+    margin-bottom: 1.15rem;
+  }
+
+  .turnos-refresh-btn {
+    top: 0.85rem;
+    right: 0.85rem;
+    width: 2.35rem;
+    height: 2.35rem;
+  }
+
+  .mis-turnos-item {
+    gap: 0.75rem;
+  }
+
+  .mis-turnos-main {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .mis-turnos-date {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .turnos-heading .title {
+    font-size: clamp(1.55rem, 8vw, 2rem);
+  }
+
+  .turnos-heading p {
+    font-size: 0.9rem;
+  }
+
+  .turnos-calendar-grid {
+    gap: 0.25rem;
+  }
+
+  .turnos-day {
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+  }
+}
