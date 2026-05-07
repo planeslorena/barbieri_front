@@ -2,6 +2,8 @@
 
 import type { TurnoCliente } from '@/app/services/turnos';
 
+const SERVICIO_SIN_NOMBRE = 'Tratamiento';
+
 interface Props {
   turnos: TurnoCliente[];
   loading: boolean;
@@ -73,7 +75,7 @@ export default function MisTurnos({
               <article className="mis-turnos-item" key={turno.id_turno}>
                 <div className="mis-turnos-main">
                   <div>
-                    <strong>{turno.servicio.nombre}</strong>
+                    <strong>{turno.servicio.nombre || SERVICIO_SIN_NOMBRE}</strong>
                     <span>{turno.profesional.nombre}</span>
                   </div>
                   <div className="mis-turnos-date">

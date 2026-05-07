@@ -7,6 +7,12 @@ export interface ServicioTurno {
   precio: number;
   reserva: number;
   visible_cliente: boolean;
+  categoria?: {
+    id_categoria_servicio: number;
+    nombre: string;
+    descripcion?: string | null;
+    orden: number;
+  } | null;
 }
 
 export interface ProfesionalTurno {
