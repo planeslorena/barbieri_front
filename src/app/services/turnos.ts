@@ -3,6 +3,7 @@ import clientAxios from './axios';
 export interface ServicioTurno {
   id_servicio: number;
   nombre: string;
+  descripcion?: string | null;
   duracion: number;
   precio: number;
   reserva: number;
@@ -10,7 +11,6 @@ export interface ServicioTurno {
   categoria?: {
     id_categoria_servicio: number;
     nombre: string;
-    descripcion?: string | null;
     orden: number;
   } | null;
 }

@@ -238,8 +238,16 @@
 }
 
 .turnos-option strong,
+.turnos-option-description,
 .turnos-option small {
   display: block;
+}
+
+.turnos-option-description {
+  margin-top: 0.25rem;
+  color: #5f5a51;
+  font-size: 0.94rem;
+  line-height: 1.35;
 }
 
 .turnos-option small {

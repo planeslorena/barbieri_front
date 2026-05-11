@@ -69,6 +69,9 @@ export default function SeleccionServicio({ profesional, onSelect }: Props) {
                   >
                     <span>
                       <strong>{servicio.nombre || SERVICIO_SIN_NOMBRE}</strong>
+                      {servicio.descripcion && (
+                        <span className="turnos-option-description">{servicio.descripcion}</span>
+                      )}
                       <small>{servicio.duracion} min - Reserva ${servicio.reserva}</small>
                     </span>
                     <i className="bi bi-arrow-right-short"></i>
