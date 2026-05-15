@@ -18,11 +18,13 @@ interface AdminDataTableProps<T> {
   columns: ColumnDef<T>[];
   searchPlaceholder?: string;
   emptyMessage?: string;
+  isDeleted?: (row: T) => boolean;
   onCreate?: () => void;
   createLabel?: string;
   onView?: (row: T) => void;
   onEdit?: (row: T) => void;
   onDelete?: (row: T) => void;
+  onRestore?: (row: T) => void;
 }
 
 export function AdminDataTable<T>({
@@ -30,11 +32,13 @@ export function AdminDataTable<T>({
   columns,
   searchPlaceholder = 'Buscar',
   emptyMessage = 'No hay datos para mostrar.',
+  isDeleted,
   onCreate,
   createLabel = 'Agregar',
   onView,
   onEdit,
   onDelete,
+  onRestore,
 }: AdminDataTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -43,30 +47,39 @@ export function AdminDataTable<T>({
     id: 'actions',
     header: 'Acciones',
     enableSorting: false,
-    cell: ({ row }) => (
-      <div className="admin-row-actions">
-        {onView && (
-          <button type="button" className="admin-icon-btn" onClick={() => onView(row.original)} aria-label="Ver">
-            <i className="bi bi-eye" />
-          </button>
-        )}
-        {onEdit && (
-          <button type="button" className="admin-icon-btn" onClick={() => onEdit(row.original)} aria-label="Editar">
-            <i className="bi bi-pencil" />
-          </button>
-        )}
-        {onDelete && (
-          <button type="button" className="admin-icon-btn admin-icon-danger" onClick={() => onDelete(row.original)} aria-label="Eliminar">
-            <i className="bi bi-trash3" />
-          </button>
-        )}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const deleted = isDeleted?.(row.original) || false;
+
+      return (
+        <div className="admin-row-actions">
+          {onView && (
+            <button type="button" className="admin-icon-btn" onClick={() => onView(row.original)} aria-label="Ver">
+              <i className="bi bi-eye" />
+            </button>
+          )}
+          {onEdit && !deleted && (
+            <button type="button" className="admin-icon-btn" onClick={() => onEdit(row.original)} aria-label="Editar">
+              <i className="bi bi-pencil" />
+            </button>
+          )}
+          {onDelete && !deleted && (
+            <button type="button" className="admin-icon-btn admin-icon-danger" onClick={() => onDelete(row.original)} aria-label="Eliminar">
+              <i className="bi bi-trash3" />
+            </button>
+          )}
+          {onRestore && deleted && (
+            <button type="button" className="admin-icon-btn" onClick={() => onRestore(row.original)} aria-label="Reactivar">
+              <i className="bi bi-arrow-counterclockwise" />
+            </button>
+          )}
+        </div>
+      );
+    },
   };
 
   const table = useReactTable({
     data,
-    columns: onView || onEdit || onDelete ? [...columns, actionColumn] : columns,
+    columns: onView || onEdit || onDelete || onRestore ? [...columns, actionColumn] : columns,
     state: { sorting, globalFilter },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
@@ -120,7 +133,7 @@ export function AdminDataTable<T>({
               </tr>
             )}
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
+              <tr key={row.id} className={isDeleted?.(row.original) ? 'admin-row-disabled' : undefined}>
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
                 ))}

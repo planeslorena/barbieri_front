@@ -16,6 +16,7 @@ export interface CategoriaServicioAdmin {
 
 export interface ServicioAdmin {
   id_servicio: number;
+  deletedAt?: string | null;
   nombre: string;
   descripcion?: string | null;
   duracion: number;
@@ -40,6 +41,7 @@ export interface DisponibilidadServicioAdmin extends HorarioAdmin {
 
 export interface ProfesionalAdmin {
   id_profesional: number;
+  deletedAt?: string | null;
   nombre: string;
   dni: number;
   mail: string;

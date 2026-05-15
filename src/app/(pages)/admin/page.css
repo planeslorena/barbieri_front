@@ -1,6 +1,6 @@
 .admin-page {
     min-height: 100vh;
-    background: var(--background);
+    background: #fbfaf8;
     padding: 32px 16px 56px;
 }
 
@@ -22,7 +22,7 @@
     color: var(--color-primary);
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.78rem;
+    font-size: 1rem;
     letter-spacing: 0;
     margin-bottom: 4px;
 }
@@ -32,7 +32,18 @@
     gap: 8px;
     overflow-x: auto;
     padding-bottom: 10px;
+}
+
+.admin-tabs-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     margin-bottom: 18px;
+}
+
+.admin-tabs-row .admin-tabs {
+    flex: 1;
+    min-width: 0;
 }
 
 .admin-tab {
@@ -85,6 +96,10 @@
     max-width: 180px;
 }
 
+.admin-professional-select {
+    max-width: 260px;
+}
+
 .admin-table {
     margin-bottom: 0;
     color: var(--font-color);
@@ -103,9 +118,34 @@
     font-size: 0.92rem;
 }
 
+.admin-table tr.admin-row-disabled td {
+    background: #f1f1f1;
+    color: #8a9096;
+}
+
+.admin-table tr.admin-row-disabled .admin-icon-btn {
+    background: #fafafa;
+    color: #6c7278;
+}
+
 .admin-row-actions {
     display: flex;
     gap: 6px;
+}
+
+.admin-schedule-summary {
+    display: grid;
+    gap: 4px;
+    min-width: 260px;
+    max-width: 520px;
+}
+
+.admin-schedule-summary span {
+    overflow-wrap: anywhere;
+}
+
+.admin-schedule-summary strong {
+    color: var(--font-color);
 }
 
 .admin-icon-btn {
@@ -117,11 +157,21 @@
     border: 1px solid rgba(38, 55, 64, 0.12);
     border-radius: 7px;
     background: white;
-    color: var(--font-color);
 }
 
 .admin-icon-btn:disabled {
     opacity: 0.45;
+}
+
+.admin-refresh-btn {
+    flex: 0 0 auto;
+}
+
+.admin-refresh-btn .bi-arrow-clockwise {
+    color: var(--color-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+    -webkit-text-stroke: 0.45px currentColor;
 }
 
 .admin-icon-danger {
@@ -214,12 +264,12 @@
 }
 
 .admin-agenda-table {
-    min-width: 760px;
+    min-width: 980px;
     margin-bottom: 0;
 }
 
 .admin-agenda-table th {
-    background: rgba(232, 225, 213, 0.45);
+    background: #f4f0e9;
     color: var(--font-color);
     white-space: nowrap;
 }
@@ -230,26 +280,96 @@
 }
 
 .agenda-cell {
-    min-width: 160px;
+    min-width: 125px;
     cursor: pointer;
     border-left: 1px solid rgba(38, 55, 64, 0.08);
 }
 
 .agenda-free {
-    background: rgba(40, 167, 69, 0.1) !important;
+    background: white !important;
+    color: #4b8a64 !important;
+    font-weight: 500;
 }
 
 .agenda-busy {
-    background: rgba(161, 141, 65, 0.16) !important;
+    background: #f3efe2 !important;
+    border-left: 4px solid var(--color-primary);
+}
+
+.agenda-overbooked {
+    background: #f0ead9 !important;
+}
+
+.agenda-overbook-item {
+    display: grid;
+    gap: 2px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(38, 55, 64, 0.14);
+}
+
+.agenda-overbook-item span {
+    width: fit-content;
+    border-radius: 7px;
+    background: rgba(180, 35, 24, 0.12);
+    color: #b42318;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    text-transform: uppercase;
+}
+
+.agenda-extra-badge {
+    display: block;
+    width: fit-content;
+    border-radius: 7px;
+    background: rgba(161, 141, 65, 0.18);
+    color: #8b7528;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    padding: 2px 7px;
+    text-transform: uppercase;
+}
+
+.agenda-service-deleted {
+    display: inline-block;
+    border-radius: 7px;
+    background: rgba(108, 117, 125, 0.14);
+    color: #6c7278;
+    font-size: 0.68rem;
+    font-weight: 700;
+    margin-left: 6px;
+    padding: 1px 6px;
+    text-transform: uppercase;
+}
+
+.agenda-overbook-item .agenda-extra-badge {
+    background: rgba(161, 141, 65, 0.18);
+    color: #8b7528;
 }
 
 .agenda-blocked {
-    background: rgba(180, 35, 24, 0.12) !important;
+    background: #f1f1f1 !important;
+    color: #6c7278 !important;
+    cursor: default;
+}
+
+.agenda-blocked span {
+    display: block;
+    font-weight: 600;
+}
+
+.agenda-blocked small {
+    display: block;
+    color: #7b8288;
+    margin-top: 2px;
 }
 
 .agenda-out {
-    background: rgba(108, 117, 125, 0.08) !important;
-    color: #6c757d !important;
+    background: #fafafa !important;
+    color: #a0a7ad !important;
+    cursor: default;
 }
 
 @media (max-width: 768px) {
@@ -264,7 +384,13 @@
         flex-direction: column;
     }
 
+    .admin-tabs-row {
+        align-items: center;
+        gap: 8px;
+    }
+
     .admin-search,
+    .admin-professional-select,
     .admin-date-input {
         max-width: none;
         width: 100%;

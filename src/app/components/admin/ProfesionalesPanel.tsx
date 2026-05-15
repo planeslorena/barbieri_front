@@ -1,50 +1,228 @@
-﻿'use client';
-/* eslint-disable react-hooks/set-state-in-effect */
+'use client';
 
+import { yupResolver } from '@hookform/resolvers/yup';
 import { ColumnDef } from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
 import { Modal } from 'react-bootstrap';
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import Swal from 'sweetalert2';
+import * as yup from 'yup';
 import { adminApi } from '@/app/services/admin';
 import type { DisponibilidadServicioAdmin, HorarioAdmin, ProfesionalAdmin, ServicioAdmin } from '@/app/types/admin';
 import { DIAS_SEMANA } from '@/app/types/admin';
 import { AdminDataTable } from './AdminDataTable';
 import type { CommonPanelProps } from './adminPanelTypes';
-import { apiMessage, emptyHorario, toTime } from './adminUtils';
-export function ProfesionalesPanel({ profesionales, servicios, reloadAll }: CommonPanelProps) {
-  const [modal, setModal] = useState<{ show: boolean; data?: ProfesionalAdmin; readOnly?: boolean }>({ show: false });
+import { apiMessage, createBlankHorario, toTime } from './adminUtils';
 
-  const columns = useMemo<ColumnDef<ProfesionalAdmin>[]>(() => [
-    { header: 'Nro.', accessorKey: 'id_profesional' },
-    { header: 'Nombre', accessorKey: 'nombre' },
-    { header: 'DNI', accessorKey: 'dni' },
-    { header: 'Telefono', accessorKey: 'telefono' },
-    {
-      header: 'Servicios',
-      cell: ({ row }) => row.original.servicios.map((servicio) => servicio.nombre).join(', ') || 'Sin servicios',
+type ProfesionalFormValues = {
+  nombre: string;
+  dni: string;
+  mail: string;
+  telefono: string;
+  fecha_nacimiento: string;
+  servicios: number[];
+  horarios: HorarioAdmin[];
+  disponibilidades: DisponibilidadServicioAdmin[];
+};
+
+const horarioSchema = yup.object({
+  dia: yup.number().oneOf([-1, 0, 1, 2, 3, 4, 5, 6]).required('Seleccione un dia'),
+  hora_inicio: yup.string().required('Ingrese hora de inicio'),
+  hora_fin: yup
+    .string()
+    .required('Ingrese hora de fin')
+    .test('after-start', 'La hora de fin debe ser mayor al inicio', function (value) {
+      const { hora_inicio } = this.parent as HorarioAdmin;
+      if (!hora_inicio || !value) return true;
+      return value > hora_inicio;
+    }),
+});
+
+const disponibilidadSchema = horarioSchema.shape({
+  id_servicio: yup.number().required('Seleccione un servicio'),
+});
+
+function isDisponibilidadInsideHorarioBase(disponibilidad: HorarioAdmin, horarios: HorarioAdmin[]) {
+  return horarios.some(
+    (horario) => {
+      const diaHorario = Number(horario.dia);
+      const diaDisponibilidad = Number(disponibilidad.dia);
+      const mismoDia = diaHorario === diaDisponibilidad || (diaHorario === -1 && diaDisponibilidad >= 1 && diaDisponibilidad <= 5);
+
+      return mismoDia
+      && toTime(horario.hora_inicio) <= toTime(disponibilidad.hora_inicio)
+      && toTime(horario.hora_fin) >= toTime(disponibilidad.hora_fin);
     },
-    {
-      header: 'Horarios',
-      cell: ({ row }) => row.original.horarios.map((h) => `${DIAS_SEMANA[h.dia]} ${toTime(h.hora_inicio)}-${toTime(h.hora_fin)}`).join(' | ') || 'Sin horarios',
-    },
-  ], []);
+  );
+}
+
+const profesionalSchema = yup.object({
+  nombre: yup.string().trim().required('El nombre es requerido'),
+  dni: yup
+    .string()
+    .required('El DNI es requerido')
+    .matches(/^\d+$/, 'El DNI debe contener solo numeros')
+    .min(7, 'El DNI debe tener al menos 7 digitos')
+    .max(8, 'El DNI no puede tener mas de 8 digitos'),
+  mail: yup.string().trim().email('Ingrese un email valido').required('El email es requerido'),
+  telefono: yup
+    .string()
+    .required('El telefono es requerido')
+    .matches(/^\d+$/, 'El telefono debe contener solo numeros'),
+  fecha_nacimiento: yup.string().required('La fecha de nacimiento es requerida'),
+  servicios: yup.array().of(yup.number().required()).min(1, 'Debe seleccionar al menos un servicio').required(),
+  horarios: yup.array().of(horarioSchema).min(1, 'Debe ingresar al menos un horario').required(),
+  disponibilidades: yup.array().of(disponibilidadSchema).optional().default([]),
+}).test('disponibilidades-dentro-horario-base', function (values) {
+  const horarios = values.horarios || [];
+  const disponibilidades = values.disponibilidades || [];
+  const invalidIndex = disponibilidades.findIndex(
+    (disponibilidad) => !isDisponibilidadInsideHorarioBase(disponibilidad, horarios),
+  );
+
+  if (invalidIndex === -1) return true;
+
+  return this.createError({
+    path: `disponibilidades.${invalidIndex}.hora_fin`,
+    message: 'La disponibilidad especifica debe estar dentro de un horario base del mismo dia.',
+  });
+});
+
+function horarioLabel(horario: HorarioAdmin) {
+  if (Number(horario.dia) === -1) return `Lunes a viernes ${toTime(horario.hora_inicio)}-${toTime(horario.hora_fin)}`;
+  return `${DIAS_SEMANA[horario.dia]} ${toTime(horario.hora_inicio)}-${toTime(horario.hora_fin)}`;
+}
+
+function expandHorariosDiasHabiles(horarios: HorarioAdmin[]) {
+  return horarios.flatMap((horario) => {
+    if (Number(horario.dia) !== -1) {
+      return [{ ...horario, dia: Number(horario.dia) }];
+    }
+
+    return [1, 2, 3, 4, 5].map((dia) => ({
+      ...horario,
+      id_horario: null,
+      dia,
+    }));
+  });
+}
+
+function mergeHorarios(horarios: HorarioAdmin[]) {
+  const sortedHorarios = [...horarios]
+    .filter((horario) => horario.hora_inicio && horario.hora_fin)
+    .sort((a, b) => {
+      if (a.dia !== b.dia) return a.dia - b.dia;
+      if (toTime(a.hora_inicio) !== toTime(b.hora_inicio)) {
+        return toTime(a.hora_inicio).localeCompare(toTime(b.hora_inicio));
+      }
+      return toTime(a.hora_fin).localeCompare(toTime(b.hora_fin));
+    });
+
+  return sortedHorarios.reduce<HorarioAdmin[]>((merged, horario) => {
+    const current = {
+      ...horario,
+      dia: Number(horario.dia),
+      hora_inicio: toTime(horario.hora_inicio),
+      hora_fin: toTime(horario.hora_fin),
+    };
+    const previous = merged[merged.length - 1];
+
+    if (!previous || previous.dia !== current.dia || toTime(previous.hora_fin) < current.hora_inicio) {
+      merged.push(current);
+      return merged;
+    }
+
+    if (toTime(previous.hora_fin) < current.hora_fin) {
+      previous.hora_fin = current.hora_fin;
+    }
+
+    return merged;
+  }, []);
+}
+
+function ProfesionalDisponibilidadCell({ profesional }: { profesional: ProfesionalAdmin }) {
+  const horarios = mergeHorarios([
+    ...(profesional.horarios || []),
+    ...(profesional.disponibilidades || []),
+  ]);
+
+  if (!horarios.length) {
+    return <span>Sin horarios</span>;
+  }
+
+  return (
+    <div className="admin-schedule-summary">
+      <span>{horarios.map(horarioLabel).join(' | ')}</span>
+    </div>
+  );
+}
+
+export function ProfesionalesPanel({ profesionales, servicios, reloadAll }: CommonPanelProps) {
+  const [modal, setModal] = useState<{ show: boolean; data?: ProfesionalAdmin; readOnly?: boolean }>({
+    show: false,
+  });
+
+  const columns = useMemo<ColumnDef<ProfesionalAdmin>[]>(
+    () => [
+      { header: 'Nro.', accessorKey: 'id_profesional' },
+      { header: 'Nombre', accessorKey: 'nombre' },
+      { header: 'DNI', accessorKey: 'dni' },
+      { header: 'Telefono', accessorKey: 'telefono' },
+      {
+        header: 'Estado',
+        cell: ({ row }) => (row.original.deletedAt ? 'Deshabilitado' : 'Activo'),
+      },
+      {
+        header: 'Servicios',
+        cell: ({ row }) => row.original.servicios.map((servicio) => servicio.nombre).join(', ') || 'Sin servicios',
+      },
+      {
+        header: 'Horarios',
+        cell: ({ row }) => <ProfesionalDisponibilidadCell profesional={row.original} />,
+      },
+    ],
+    [],
+  );
 
   const deleteProfesional = async (profesional: ProfesionalAdmin) => {
     const result = await Swal.fire({
       title: 'Eliminar profesional',
-      text: `Seguro que queres dar de baja a ${profesional.nombre}?`,
+      text: `Seguro que queres deshabilitar a ${profesional.nombre}?`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Eliminar',
+      confirmButtonText: 'Deshabilitar',
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#a18d41',
     });
 
     if (!result.isConfirmed) return;
+
     try {
       await adminApi.deleteProfesional(profesional.id_profesional);
       await reloadAll();
-      Swal.fire('Listo', 'Profesional eliminado.', 'success');
+      Swal.fire('Listo', 'Profesional deshabilitado.', 'success');
+    } catch (error) {
+      Swal.fire('Error', apiMessage(error), 'error');
+    }
+  };
+
+  const restoreProfesional = async (profesional: ProfesionalAdmin) => {
+    const result = await Swal.fire({
+      title: 'Reactivar profesional',
+      text: `Seguro que queres volver a habilitar a ${profesional.nombre}?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Reactivar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#a18d41',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await adminApi.restoreProfesional(profesional.id_profesional);
+      await reloadAll();
+      Swal.fire('Listo', 'Profesional reactivado.', 'success');
     } catch (error) {
       Swal.fire('Error', apiMessage(error), 'error');
     }
@@ -57,19 +235,25 @@ export function ProfesionalesPanel({ profesionales, servicios, reloadAll }: Comm
         columns={columns}
         searchPlaceholder="Buscar profesional"
         createLabel="Agregar profesional"
+        isDeleted={(row) => Boolean(row.deletedAt)}
         onCreate={() => setModal({ show: true })}
         onView={(row) => setModal({ show: true, data: row, readOnly: true })}
         onEdit={(row) => setModal({ show: true, data: row })}
         onDelete={deleteProfesional}
+        onRestore={restoreProfesional}
       />
-      <ProfesionalModal
-        show={modal.show}
-        data={modal.data}
-        readOnly={modal.readOnly}
-        servicios={servicios}
-        onClose={() => setModal({ show: false })}
-        onSaved={reloadAll}
-      />
+
+      {modal.show && (
+        <ProfesionalModal
+          key={modal.data?.id_profesional ?? 'new-profesional'}
+          show={modal.show}
+          data={modal.data}
+          readOnly={modal.readOnly}
+          servicios={servicios}
+          onClose={() => setModal({ show: false })}
+          onSaved={reloadAll}
+        />
+      )}
     </>
   );
 }
@@ -89,144 +273,323 @@ function ProfesionalModal({
   onClose: () => void;
   onSaved: () => Promise<void>;
 }) {
-  const [form, setForm] = useState({
-    nombre: '',
-    dni: '',
-    mail: '',
-    telefono: '',
-    fecha_nacimiento: '',
-    servicios: [] as number[],
-    horarios: [emptyHorario] as HorarioAdmin[],
-    disponibilidades: [] as DisponibilidadServicioAdmin[],
+  const {
+    control,
+    formState: { errors, isSubmitting },
+    handleSubmit,
+    register,
+    reset,
+  } = useForm<ProfesionalFormValues>({
+    mode: 'onChange',
+    resolver: yupResolver(profesionalSchema),
+    defaultValues: {
+      nombre: '',
+      dni: '',
+      mail: '',
+      telefono: '',
+      fecha_nacimiento: '',
+      servicios: [],
+      horarios: [createBlankHorario()],
+      disponibilidades: [],
+    },
+  });
+
+  const selectedServicios = useWatch({ control, name: 'servicios' }) || [];
+  const serviciosSeleccionados = useMemo(
+    () => servicios.filter((servicio) => selectedServicios.includes(servicio.id_servicio)),
+    [servicios, selectedServicios],
+  );
+  const {
+    fields: horarioFields,
+    append: appendHorario,
+    remove: removeHorario,
+  } = useFieldArray({
+    control,
+    name: 'horarios',
+  });
+  const {
+    fields: disponibilidadFields,
+    append: appendDisponibilidad,
+    remove: removeDisponibilidad,
+  } = useFieldArray({
+    control,
+    name: 'disponibilidades',
   });
 
   useEffect(() => {
     if (!show) return;
-    setForm({
+
+    reset({
       nombre: data?.nombre || '',
       dni: data?.dni?.toString() || '',
       mail: data?.mail || '',
       telefono: data?.telefono?.toString() || '',
       fecha_nacimiento: data?.fecha_nacimiento || '',
       servicios: data?.servicios.map((servicio) => servicio.id_servicio) || [],
-      horarios: data?.horarios.length ? data.horarios : [emptyHorario],
+      horarios: data?.horarios.length ? data.horarios : [createBlankHorario()],
       disponibilidades: data?.disponibilidades || [],
     });
-  }, [data, show]);
+  }, [data, reset, show]);
 
-  const setHorario = (index: number, patch: Partial<HorarioAdmin>) => {
-    setForm((current) => ({
-      ...current,
-      horarios: current.horarios.map((horario, i) => (i === index ? { ...horario, ...patch } : horario)),
-    }));
-  };
+  const submit = handleSubmit(
+    async (values) => {
+      try {
+        const selectedServiceIds = values.servicios.map(Number);
+        const horarios = expandHorariosDiasHabiles(values.horarios);
+        const payload = {
+          nombre: values.nombre,
+          dni: Number(values.dni),
+          mail: values.mail,
+          telefono: Number(values.telefono),
+          fecha_nacimiento: values.fecha_nacimiento,
+          servicios: selectedServiceIds,
+          horarios: horarios.map((horario) => ({
+            ...horario,
+            dia: Number(horario.dia),
+          })),
+          disponibilidades: (values.disponibilidades || [])
+            .map((disponibilidad) => ({
+              ...disponibilidad,
+              id_servicio: Number(disponibilidad.id_servicio),
+              dia: Number(disponibilidad.dia),
+            }))
+            .filter((disponibilidad) => selectedServiceIds.includes(disponibilidad.id_servicio)),
+        };
 
-  const setDisponibilidad = (index: number, patch: Partial<DisponibilidadServicioAdmin>) => {
-    setForm((current) => ({
-      ...current,
-      disponibilidades: current.disponibilidades.map((disponibilidad, i) => (
-        i === index ? { ...disponibilidad, ...patch } : disponibilidad
-      )),
-    }));
-  };
+        if (data) await adminApi.updateProfesional(data.id_profesional, payload);
+        else await adminApi.createProfesional(payload);
 
-  const submit = async () => {
-    try {
-      const payload = {
-        nombre: form.nombre,
-        dni: Number(form.dni),
-        mail: form.mail,
-        telefono: Number(form.telefono),
-        fecha_nacimiento: form.fecha_nacimiento,
-        servicios: form.servicios,
-        horarios: form.horarios,
-        disponibilidades: form.disponibilidades,
-      };
-
-      if (data) await adminApi.updateProfesional(data.id_profesional, payload);
-      else await adminApi.createProfesional(payload);
-
-      await onSaved();
-      onClose();
-      Swal.fire('Listo', 'Profesional guardado.', 'success');
-    } catch (error) {
-      Swal.fire('Error', apiMessage(error), 'error');
-    }
-  };
+        await onSaved();
+        onClose();
+        Swal.fire('Listo', 'Profesional guardado.', 'success');
+      } catch (error) {
+        Swal.fire('Error', apiMessage(error), 'error');
+      }
+    },
+    () => {
+      Swal.fire('Revisa el formulario', 'Completá los campos marcados antes de guardar.', 'warning');
+    },
+  );
 
   return (
     <Modal show={show} onHide={onClose} size="lg" scrollable backdrop="static">
       <Modal.Header closeButton>
         <Modal.Title>{readOnly ? 'Ver profesional' : data ? 'Modificar profesional' : 'Agregar profesional'}</Modal.Title>
       </Modal.Header>
+
       <Modal.Body>
-        <div className="admin-form-grid">
-          <label>Nombre<input className="form-control" value={form.nombre} readOnly={readOnly} onChange={(e) => setForm({ ...form, nombre: e.target.value })} /></label>
-          <label>DNI<input className="form-control" type="number" value={form.dni} readOnly={readOnly} onChange={(e) => setForm({ ...form, dni: e.target.value })} /></label>
-          <label>Email<input className="form-control" type="email" value={form.mail} readOnly={readOnly} onChange={(e) => setForm({ ...form, mail: e.target.value })} /></label>
-          <label>Telefono<input className="form-control" type="number" value={form.telefono} readOnly={readOnly} onChange={(e) => setForm({ ...form, telefono: e.target.value })} /></label>
-          <label>Fecha nacimiento<input className="form-control" type="date" value={form.fecha_nacimiento} readOnly={readOnly} onChange={(e) => setForm({ ...form, fecha_nacimiento: e.target.value })} /></label>
-        </div>
-
-        <h3 className="admin-modal-subtitle">Servicios</h3>
-        <div className="admin-checkbox-grid">
-          {servicios.map((servicio) => (
-            <label key={servicio.id_servicio} className="form-check">
+        <form id="profesional-admin-form" onSubmit={submit}>
+          <div className="admin-form-grid">
+            <label>
+              Nombre
               <input
-                className="form-check-input"
-                type="checkbox"
-                disabled={readOnly}
-                checked={form.servicios.includes(servicio.id_servicio)}
-                onChange={(event) => {
-                  setForm((current) => ({
-                    ...current,
-                    servicios: event.target.checked
-                      ? [...current.servicios, servicio.id_servicio]
-                      : current.servicios.filter((id) => id !== servicio.id_servicio),
-                  }));
-                }}
+                className={`form-control ${errors.nombre ? 'is-invalid' : ''}`}
+                readOnly={readOnly}
+                {...register('nombre')}
               />
-              <span>{servicio.nombre}</span>
+              {errors.nombre && <div className="invalid-feedback">{errors.nombre.message}</div>}
             </label>
+
+            <label>
+              DNI
+              <input
+                className={`form-control ${errors.dni ? 'is-invalid' : ''}`}
+                readOnly={readOnly}
+                type="number"
+                {...register('dni')}
+              />
+              {errors.dni && <div className="invalid-feedback">{errors.dni.message}</div>}
+            </label>
+
+            <label>
+              Email
+              <input
+                className={`form-control ${errors.mail ? 'is-invalid' : ''}`}
+                readOnly={readOnly}
+                type="email"
+                {...register('mail')}
+              />
+              {errors.mail && <div className="invalid-feedback">{errors.mail.message}</div>}
+            </label>
+
+            <label>
+              Telefono
+              <input
+                className={`form-control ${errors.telefono ? 'is-invalid' : ''}`}
+                readOnly={readOnly}
+                type="number"
+                {...register('telefono')}
+              />
+              {errors.telefono && <div className="invalid-feedback">{errors.telefono.message}</div>}
+            </label>
+
+            <label>
+              Fecha nacimiento
+              <input
+                className={`form-control ${errors.fecha_nacimiento ? 'is-invalid' : ''}`}
+                readOnly={readOnly}
+                type="date"
+                {...register('fecha_nacimiento')}
+              />
+              {errors.fecha_nacimiento && <div className="invalid-feedback">{errors.fecha_nacimiento.message}</div>}
+            </label>
+          </div>
+
+          <h3 className="admin-modal-subtitle">Servicios</h3>
+          <Controller
+            control={control}
+            name="servicios"
+            render={({ field }) => {
+              const selected = field.value || [];
+
+              return (
+                <div className="admin-checkbox-grid">
+                  {servicios.map((servicio) => {
+                    const checked = selected.includes(servicio.id_servicio);
+
+                    return (
+                      <label key={servicio.id_servicio} className="form-check">
+                        <input
+                          checked={checked}
+                          className="form-check-input"
+                          disabled={readOnly}
+                          type="checkbox"
+                          onChange={(event) => {
+                            const nextServicios = event.target.checked
+                              ? [...selected, servicio.id_servicio]
+                              : selected.filter((id) => id !== servicio.id_servicio);
+
+                            field.onChange(nextServicios);
+                          }}
+                        />
+                        <span>{servicio.nombre}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              );
+            }}
+          />
+          {errors.servicios && <div className="text-danger mt-2">{errors.servicios.message}</div>}
+
+          <h3 className="admin-modal-subtitle">Horarios base</h3>
+          {horarioFields.map((field, index) => (
+            <div className="admin-inline-row" key={field.id}>
+              <select className="form-select" disabled={readOnly} {...register(`horarios.${index}.dia`, { valueAsNumber: true })}>
+                {!readOnly && <option value={-1}>Lunes a viernes</option>}
+                {Object.entries(DIAS_SEMANA).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+
+              <input
+                className={`form-control ${errors.horarios?.[index]?.hora_inicio ? 'is-invalid' : ''}`}
+                readOnly={readOnly}
+                type="time"
+                {...register(`horarios.${index}.hora_inicio`)}
+              />
+              {errors.horarios?.[index]?.hora_inicio && (
+                <div className="invalid-feedback">{errors.horarios[index]?.hora_inicio?.message}</div>
+              )}
+
+              <input
+                className={`form-control ${errors.horarios?.[index]?.hora_fin ? 'is-invalid' : ''}`}
+                readOnly={readOnly}
+                type="time"
+                {...register(`horarios.${index}.hora_fin`)}
+              />
+              {errors.horarios?.[index]?.hora_fin && (
+                <div className="invalid-feedback">{errors.horarios[index]?.hora_fin?.message}</div>
+              )}
+
+              {!readOnly && (
+                <button className="admin-icon-btn admin-icon-danger" type="button" onClick={() => removeHorario(index)}>
+                  <i className="bi bi-x-lg" />
+                </button>
+              )}
+            </div>
           ))}
-        </div>
+          {errors.horarios?.root && <div className="text-danger mt-2">{errors.horarios.root.message}</div>}
+          {!readOnly && (
+            <button className="btn btn-outline-secondary btn-sm mt-2" type="button" onClick={() => appendHorario(createBlankHorario())}>
+              Agregar horario
+            </button>
+          )}
 
-        <h3 className="admin-modal-subtitle">Horarios base</h3>
-        {form.horarios.map((horario, index) => (
-          <div className="admin-inline-row" key={`horario-${index}`}>
-            <select className="form-select" value={horario.dia} disabled={readOnly} onChange={(e) => setHorario(index, { dia: Number(e.target.value) })}>
-              {Object.entries(DIAS_SEMANA).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-            </select>
-            <input className="form-control" type="time" value={toTime(horario.hora_inicio)} readOnly={readOnly} onChange={(e) => setHorario(index, { hora_inicio: e.target.value })} />
-            <input className="form-control" type="time" value={toTime(horario.hora_fin)} readOnly={readOnly} onChange={(e) => setHorario(index, { hora_fin: e.target.value })} />
-            {!readOnly && <button type="button" className="admin-icon-btn admin-icon-danger" onClick={() => setForm({ ...form, horarios: form.horarios.filter((_, i) => i !== index) })}><i className="bi bi-x-lg" /></button>}
-          </div>
-        ))}
-        {!readOnly && <button type="button" className="btn btn-outline-secondary btn-sm mt-2" onClick={() => setForm({ ...form, horarios: [...form.horarios, emptyHorario] })}>Agregar horario</button>}
+          <h3 className="admin-modal-subtitle">Disponibilidad por servicio</h3>
+          {disponibilidadFields.map((field, index) => (
+            <div className="admin-inline-row" key={field.id}>
+              <select className="form-select" disabled={readOnly} {...register(`disponibilidades.${index}.id_servicio`, { valueAsNumber: true })}>
+                {serviciosSeleccionados.map((servicio) => (
+                  <option key={servicio.id_servicio} value={servicio.id_servicio}>
+                    {servicio.nombre}
+                  </option>
+                ))}
+              </select>
 
-        <h3 className="admin-modal-subtitle">Disponibilidad por servicio</h3>
-        {form.disponibilidades.map((disponibilidad, index) => (
-          <div className="admin-inline-row" key={`disp-${index}`}>
-            <select className="form-select" value={disponibilidad.id_servicio} disabled={readOnly} onChange={(e) => setDisponibilidad(index, { id_servicio: Number(e.target.value) })}>
-              {servicios.map((servicio) => <option key={servicio.id_servicio} value={servicio.id_servicio}>{servicio.nombre}</option>)}
-            </select>
-            <select className="form-select" value={disponibilidad.dia} disabled={readOnly} onChange={(e) => setDisponibilidad(index, { dia: Number(e.target.value) })}>
-              {Object.entries(DIAS_SEMANA).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-            </select>
-            <input className="form-control" type="time" value={toTime(disponibilidad.hora_inicio)} readOnly={readOnly} onChange={(e) => setDisponibilidad(index, { hora_inicio: e.target.value })} />
-            <input className="form-control" type="time" value={toTime(disponibilidad.hora_fin)} readOnly={readOnly} onChange={(e) => setDisponibilidad(index, { hora_fin: e.target.value })} />
-            {!readOnly && <button type="button" className="admin-icon-btn admin-icon-danger" onClick={() => setForm({ ...form, disponibilidades: form.disponibilidades.filter((_, i) => i !== index) })}><i className="bi bi-x-lg" /></button>}
-          </div>
-        ))}
-        {!readOnly && servicios.length > 0 && (
-          <button type="button" className="btn btn-outline-secondary btn-sm mt-2" onClick={() => setForm({ ...form, disponibilidades: [...form.disponibilidades, { ...emptyHorario, id_servicio: servicios[0].id_servicio }] })}>
-            Agregar disponibilidad especifica
+              <select className="form-select" disabled={readOnly} {...register(`disponibilidades.${index}.dia`, { valueAsNumber: true })}>
+                {Object.entries(DIAS_SEMANA).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+
+              <input
+                className={`form-control ${errors.disponibilidades?.[index]?.hora_inicio ? 'is-invalid' : ''}`}
+                readOnly={readOnly}
+                type="time"
+                {...register(`disponibilidades.${index}.hora_inicio`)}
+              />
+              {errors.disponibilidades?.[index]?.hora_inicio && (
+                <div className="invalid-feedback">{errors.disponibilidades[index]?.hora_inicio?.message}</div>
+              )}
+
+              <input
+                className={`form-control ${errors.disponibilidades?.[index]?.hora_fin ? 'is-invalid' : ''}`}
+                readOnly={readOnly}
+                type="time"
+                {...register(`disponibilidades.${index}.hora_fin`)}
+              />
+              {errors.disponibilidades?.[index]?.hora_fin && (
+                <div className="invalid-feedback">{errors.disponibilidades[index]?.hora_fin?.message}</div>
+              )}
+
+              {!readOnly && (
+                <button className="admin-icon-btn admin-icon-danger" type="button" onClick={() => removeDisponibilidad(index)}>
+                  <i className="bi bi-x-lg" />
+                </button>
+              )}
+            </div>
+          ))}
+          {!readOnly && serviciosSeleccionados.length > 0 && (
+            <button
+              className="btn btn-outline-secondary btn-sm mt-2"
+              type="button"
+              onClick={() => appendDisponibilidad({ ...createBlankHorario(), id_servicio: serviciosSeleccionados[0].id_servicio })}
+            >
+              Agregar disponibilidad especifica
+            </button>
+          )}
+        </form>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <button className="btn btn-light" type="button" onClick={onClose}>
+          Cerrar
+        </button>
+        {!readOnly && (
+          <button
+            className="btn-style admin-primary-btn"
+            disabled={isSubmitting}
+            form="profesional-admin-form"
+            type="submit"
+          >
+            Guardar
           </button>
         )}
-      </Modal.Body>
-      <Modal.Footer>
-        <button type="button" className="btn btn-light" onClick={onClose}>Cerrar</button>
-        {!readOnly && <button type="button" className="btn-style admin-primary-btn" onClick={submit}>Guardar</button>}
       </Modal.Footer>
     </Modal>
   );

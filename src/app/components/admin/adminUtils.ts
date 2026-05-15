@@ -3,6 +3,12 @@ import type { HorarioAdmin } from '@/app/types/admin';
 
 export const emptyHorario: HorarioAdmin = { dia: 1, hora_inicio: '09:00', hora_fin: '18:00' };
 
+export const blankHorario: HorarioAdmin = { dia: 1, hora_inicio: '', hora_fin: '' };
+
+export function createBlankHorario(): HorarioAdmin {
+  return { ...blankHorario };
+}
+
 export function today() {
   return new Date().toISOString().slice(0, 10);
 }

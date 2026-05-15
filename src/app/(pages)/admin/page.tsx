@@ -58,28 +58,36 @@ export default function Admin() {
                         <div>
                             <span className="admin-eyebrow">Gestion interna - Panel administrador</span>
                         </div>
-                        <button type="button" className="btn-style admin-primary-btn" onClick={reloadAll}>
-                            Actualizar
-                        </button>
                     </div>
 
-                    <div className="admin-tabs" role="tablist" aria-label="Secciones admin">
-                        {[
-                            ['agenda', 'Agenda'],
-                            ['profesionales', 'Profesionales'],
-                            ['servicios', 'Servicios'],
-                            ['clientes', 'Clientes'],
-                            ['bloqueos', 'Bloqueos'],
-                        ].map(([key, label]) => (
-                            <button
-                                key={key}
-                                type="button"
-                                className={`admin-tab ${activeTab === key ? 'active' : ''}`}
-                                onClick={() => setActiveTab(key)}
-                            >
-                                {label}
-                            </button>
-                        ))}
+                    <div className="admin-tabs-row">
+                        <div className="admin-tabs" role="tablist" aria-label="Secciones admin">
+                            {[
+                                ['agenda', 'Agenda'],
+                                ['profesionales', 'Profesionales'],
+                                ['servicios', 'Servicios'],
+                                ['clientes', 'Clientes'],
+                                ['bloqueos', 'Bloqueos'],
+                            ].map(([key, label]) => (
+                                <button
+                                    key={key}
+                                    type="button"
+                                    className={`admin-tab ${activeTab === key ? 'active' : ''}`}
+                                    onClick={() => setActiveTab(key)}
+                                >
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            type="button"
+                            className="admin-icon-btn admin-refresh-btn"
+                            onClick={reloadAll}
+                            aria-label="Actualizar datos"
+                            title="Actualizar datos"
+                        >
+                            <i className="bi bi-arrow-clockwise" />
+                        </button>
                     </div>
 
                     {loading && <div className="admin-loading">Cargando datos...</div>}

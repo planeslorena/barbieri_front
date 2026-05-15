@@ -43,6 +43,7 @@ export type TurnoAdminPayload = {
   hora: string;
   observaciones?: string;
   forzar_fuera_horario?: boolean;
+  confirmar_sobreturno?: boolean;
   reserva_pagada?: boolean;
 };
 
@@ -70,6 +71,10 @@ export const adminApi = {
   },
   deleteProfesional: async (id: number) => {
     const { data } = await clientAxios.delete(`/profesionales/${id}`);
+    return data;
+  },
+  restoreProfesional: async (id: number) => {
+    const { data } = await clientAxios.patch<ProfesionalAdmin>(`/profesionales/${id}/restaurar`);
     return data;
   },
   getServicios: async () => {
