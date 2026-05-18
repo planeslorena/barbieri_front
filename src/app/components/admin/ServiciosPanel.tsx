@@ -54,7 +54,7 @@ export function ServiciosPanel({ servicios, categorias, reloadAll }: CommonPanel
       { header: 'Precio', cell: ({ row }) => money(row.original.precio) },
       { header: 'Reserva', cell: ({ row }) => money(row.original.reserva) },
       { header: 'Categoria', cell: ({ row }) => row.original.categoria?.nombre || 'Sin categoria' },
-      { header: 'Cliente', cell: ({ row }) => (row.original.visible_cliente ? 'Visible' : 'Interno') },
+      { header: 'Paciente', cell: ({ row }) => (row.original.visible_cliente ? 'Visible' : 'Interno') },
     ],
     [],
   );
@@ -280,7 +280,7 @@ function ServicioModal({
 
             <label className="form-check admin-check">
               <input className="form-check-input" type="checkbox" {...register('visible_cliente')} />
-              Visible para cliente
+              Visible para paciente
             </label>
           </div>
         </form>

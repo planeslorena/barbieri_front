@@ -204,6 +204,56 @@
     color: var(--font-color);
 }
 
+.admin-patient-field {
+    display: grid;
+    gap: 8px;
+}
+
+.admin-combobox {
+    position: relative;
+}
+
+.admin-combobox-menu {
+    background: white;
+    border: 1px solid rgba(38, 55, 64, 0.14);
+    border-radius: 7px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+    left: 0;
+    max-height: 220px;
+    overflow-y: auto;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 4px);
+    z-index: 20;
+}
+
+.admin-combobox-menu button {
+    background: transparent;
+    border: 0;
+    color: var(--font-color);
+    display: grid;
+    gap: 2px;
+    padding: 9px 11px;
+    text-align: left;
+    width: 100%;
+}
+
+.admin-combobox-menu button:hover,
+.admin-combobox-menu button:focus {
+    background: #f4f0e9;
+}
+
+.admin-combobox-menu small,
+.admin-combobox-empty {
+    color: #6c7278;
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.admin-combobox-empty {
+    padding: 10px 11px;
+}
+
 .admin-span-2 {
     grid-column: 1 / -1;
 }
@@ -416,5 +466,15 @@
     .admin-table thead th,
     .admin-agenda-table th {
         background: rgba(81, 80, 80, 0.7);
+    }
+
+    .admin-combobox-menu {
+        background: rgb(66, 66, 66);
+        border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .admin-combobox-menu button:hover,
+    .admin-combobox-menu button:focus {
+        background: rgba(255, 255, 255, 0.08);
     }
 }

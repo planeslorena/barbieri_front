@@ -12,6 +12,14 @@ import type { BloqueoAdmin, ClienteAdmin, ProfesionalAdmin, ServicioAdmin, Turno
 import type { CommonPanelProps } from './adminPanelTypes';
 import { apiMessage, money, today, toTime } from './adminUtils';
 
+type AgendaApi = {
+  getTurnos: typeof adminApi.getTurnos;
+  getBloqueos: typeof adminApi.getBloqueos;
+  createTurno: typeof adminApi.createTurno;
+  cancelarTurno: typeof adminApi.cancelarTurno;
+  updateReservaPago: typeof adminApi.updateReservaPago;
+};
+
 function timeToMinutes(time: string) {
   const [hours, minutes] = time.split(':').map(Number);
   return hours * 60 + minutes;
@@ -139,7 +147,17 @@ function isWithinWorkingHours({
   });
 }
 
-export function AgendaAdminPanel({ profesionales, servicios, clientes, reloadAll }: CommonPanelProps) {
+export function AgendaAdminPanel({
+  profesionales,
+  servicios,
+  clientes,
+  reloadAll,
+  agendaApi = adminApi,
+  hideProfessionalSelect = false,
+}: CommonPanelProps & {
+  agendaApi?: AgendaApi;
+  hideProfessionalSelect?: boolean;
+}) {
   const [fecha, setFecha] = useState(today());
   const [selectedProfesionalId, setSelectedProfesionalId] = useState('');
   const [turnos, setTurnos] = useState<TurnoAdmin[]>([]);
@@ -188,8 +206,8 @@ export function AgendaAdminPanel({ profesionales, servicios, clientes, reloadAll
     }
 
     const [turnosResp, bloqueosResp] = await Promise.all([
-      adminApi.getTurnos({ desde: weekStart, hasta: weekEnd, id_profesional: selectedProfesional.id_profesional }),
-      adminApi.getBloqueos({ desde: weekStart, hasta: weekEnd, id_profesional: selectedProfesional.id_profesional }),
+      agendaApi.getTurnos({ desde: weekStart, hasta: weekEnd, id_profesional: selectedProfesional.id_profesional }),
+      agendaApi.getBloqueos({ desde: weekStart, hasta: weekEnd, id_profesional: selectedProfesional.id_profesional }),
     ]);
     setTurnos(turnosResp);
     setBloqueos(bloqueosResp);
@@ -307,11 +325,13 @@ export function AgendaAdminPanel({ profesionales, servicios, clientes, reloadAll
   return (
     <>
       <div className="admin-agenda-toolbar">
-        <select className="form-select admin-professional-select" value={selectedProfesionalId} onChange={(e) => setSelectedProfesionalId(e.target.value)}>
-          {profesionalesActivos.map((profesional) => (
-            <option key={profesional.id_profesional} value={profesional.id_profesional}>{profesional.nombre}</option>
-          ))}
-        </select>
+        {!hideProfessionalSelect && (
+          <select className="form-select admin-professional-select" value={selectedProfesionalId} onChange={(e) => setSelectedProfesionalId(e.target.value)}>
+            {profesionalesActivos.map((profesional) => (
+              <option key={profesional.id_profesional} value={profesional.id_profesional}>{profesional.nombre}</option>
+            ))}
+          </select>
+        )}
         <button className="admin-icon-btn" onClick={() => moveWeek(-1)}><i className="bi bi-chevron-left" /></button>
         <input className="form-control admin-date-input" type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
         <button className="admin-icon-btn" onClick={() => moveWeek(1)}><i className="bi bi-chevron-right" /></button>
@@ -416,7 +436,7 @@ export function AgendaAdminPanel({ profesionales, servicios, clientes, reloadAll
           </tbody>
         </table>
       </div>
-      <TurnoAdminModal show={modal.show} turno={modal.turno} defaults={modal.defaults} clientes={clientes} profesionales={profesionales} servicios={servicios} onClose={() => setModal({ show: false })} onSaved={refresh} />
+      <TurnoAdminModal show={modal.show} turno={modal.turno} defaults={modal.defaults} clientes={clientes} profesionales={profesionales} servicios={servicios} agendaApi={agendaApi} onClose={() => setModal({ show: false })} onSaved={refresh} />
     </>
   );
 }
@@ -432,7 +452,7 @@ type TurnoFormState = {
 };
 
 const turnoSchema = yup.object({
-  id_cliente: yup.string().required('Debe seleccionar un cliente'),
+  id_cliente: yup.string().required('Debe seleccionar un paciente'),
   id_profesional: yup.string().required('Debe seleccionar un profesional'),
   id_servicio: yup.string().required('Debe seleccionar un servicio'),
   fecha: yup.string().required('La fecha es requerida'),
@@ -447,6 +467,10 @@ type TurnoDefaults = Partial<Omit<TurnoFormState, 'id_cliente' | 'id_profesional
   id_servicio: string | number;
 }>;
 
+function getPacienteLabel(cliente: ClienteAdmin) {
+  return `${cliente.usuario.nombre} - DNI ${cliente.usuario.dni}`;
+}
+
 function TurnoAdminModal({
   show,
   turno,
@@ -454,6 +478,7 @@ function TurnoAdminModal({
   clientes,
   profesionales,
   servicios,
+  agendaApi,
   onClose,
   onSaved,
 }: {
@@ -463,9 +488,12 @@ function TurnoAdminModal({
   clientes: ClienteAdmin[];
   profesionales: ProfesionalAdmin[];
   servicios: ServicioAdmin[];
+  agendaApi: AgendaApi;
   onClose: () => void;
   onSaved: () => Promise<void>;
 }) {
+  const [pacienteSearch, setPacienteSearch] = useState('');
+  const [pacienteMenuOpen, setPacienteMenuOpen] = useState(false);
   const {
     control,
     formState: { errors, isSubmitting },
@@ -492,6 +520,23 @@ function TurnoAdminModal({
   const selectedProfesional = profesionales.find(
     (profesional) => profesional.id_profesional === Number(formValues.id_profesional),
   );
+  const selectedPaciente = clientes.find((cliente) => cliente.id_cliente === Number(formValues.id_cliente));
+  const pacientesFiltrados = useMemo(() => {
+    const search = pacienteSearch.trim().toLowerCase();
+    if (!search) return clientes;
+
+    return clientes.filter((cliente) => {
+      const usuario = cliente.usuario;
+      const searchable = [
+        usuario?.nombre,
+        usuario?.dni,
+        usuario?.telefono,
+        usuario?.mail,
+      ].filter(Boolean).join(' ').toLowerCase();
+
+      return searchable.includes(search);
+    });
+  }, [clientes, pacienteSearch]);
   const serviciosDelProfesional = useMemo(() => {
     if (!selectedProfesional) return turno?.servicio ? [turno.servicio] : [];
 
@@ -517,8 +562,13 @@ function TurnoAdminModal({
   useEffect(() => {
     if (!show) return;
 
+    const clienteId = turno?.cliente?.id_cliente?.toString() || (defaults?.id_cliente !== undefined ? String(defaults.id_cliente) : '');
+    const clienteSeleccionado = clientes.find((cliente) => cliente.id_cliente === Number(clienteId));
+
+    setPacienteSearch(clienteSeleccionado ? getPacienteLabel(clienteSeleccionado) : '');
+    setPacienteMenuOpen(false);
     reset({
-      id_cliente: turno?.cliente?.id_cliente?.toString() || (defaults?.id_cliente !== undefined ? String(defaults.id_cliente) : ''),
+      id_cliente: clienteId,
       id_profesional:
         turno?.profesional?.id_profesional?.toString()
         || (defaults?.id_profesional !== undefined ? String(defaults.id_profesional) : ''),
@@ -555,7 +605,7 @@ function TurnoAdminModal({
     };
 
     try {
-      await adminApi.createTurno(payload);
+      await agendaApi.createTurno(payload);
       await onSaved();
       onClose();
       Swal.fire('Listo', 'Turno creado sin Mercado Pago.', 'success');
@@ -576,7 +626,7 @@ function TurnoAdminModal({
         if (!result.isConfirmed) return;
 
         try {
-          await adminApi.createTurno({
+          await agendaApi.createTurno({
             ...payload,
             confirmar_sobreturno: true,
           });
@@ -599,7 +649,7 @@ function TurnoAdminModal({
     const result = await Swal.fire({ title: 'Cancelar turno', text: 'Esta accion no usa la regla de 24 hs.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#a18d41' });
     if (!result.isConfirmed) return;
     try {
-      await adminApi.cancelarTurno(turno.id_turno);
+      await agendaApi.cancelarTurno(turno.id_turno);
       await onSaved();
       onClose();
       Swal.fire('Listo', 'Turno cancelado.', 'success');
@@ -612,7 +662,7 @@ function TurnoAdminModal({
     if (!turno) return;
     try {
       const nextReservaPagada = !formValues.reserva_pagada;
-      await adminApi.updateReservaPago(turno.id_turno, nextReservaPagada);
+      await agendaApi.updateReservaPago(turno.id_turno, nextReservaPagada);
       await onSaved();
       setValue('reserva_pagada', nextReservaPagada);
       Swal.fire('Listo', 'Estado de reserva actualizado.', 'success');
@@ -630,21 +680,49 @@ function TurnoAdminModal({
       <Modal.Body>
         <form id="turno-admin-form" onSubmit={submit}>
           <div className="admin-form-grid">
-            <label>
-              Cliente
-              <select
-                className={`form-select ${errors.id_cliente ? 'is-invalid' : ''}`}
-                disabled={!!turno}
-                {...register('id_cliente')}
-              >
-                <option value="">Seleccionar</option>
-                {clientes.map((cliente) => (
-                  <option key={cliente.id_cliente} value={cliente.id_cliente}>
-                    {cliente.usuario.nombre} - DNI {cliente.usuario.dni}
-                  </option>
-                ))}
-              </select>
-              {errors.id_cliente && <div className="invalid-feedback">{errors.id_cliente.message}</div>}
+            <label className="admin-patient-field">
+              Paciente
+              <input type="hidden" {...register('id_cliente')} />
+              <div className="admin-combobox">
+                <input
+                  className={`form-control ${errors.id_cliente ? 'is-invalid' : ''}`}
+                  disabled={!!turno}
+                  onBlur={() => window.setTimeout(() => setPacienteMenuOpen(false), 120)}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setPacienteSearch(value);
+                    setPacienteMenuOpen(true);
+                    if (!selectedPaciente || value !== getPacienteLabel(selectedPaciente)) {
+                      setValue('id_cliente', '', { shouldValidate: true });
+                    }
+                  }}
+                  onFocus={() => !turno && setPacienteMenuOpen(true)}
+                  placeholder="Seleccione o busque un paciente..."
+                  type="search"
+                  value={pacienteSearch}
+                />
+                {pacienteMenuOpen && !turno && (
+                  <div className="admin-combobox-menu">
+                    {pacientesFiltrados.map((cliente) => (
+                      <button
+                        key={cliente.id_cliente}
+                        onMouseDown={(event) => event.preventDefault()}
+                        onClick={() => {
+                          setValue('id_cliente', String(cliente.id_cliente), { shouldValidate: true });
+                          setPacienteSearch(getPacienteLabel(cliente));
+                          setPacienteMenuOpen(false);
+                        }}
+                        type="button"
+                      >
+                        <span>{cliente.usuario.nombre}</span>
+                        <small>DNI {cliente.usuario.dni}</small>
+                      </button>
+                    ))}
+                    {!pacientesFiltrados.length && <div className="admin-combobox-empty">No hay pacientes para esa busqueda</div>}
+                  </div>
+                )}
+              </div>
+              {errors.id_cliente && <div className="invalid-feedback d-block">{errors.id_cliente.message}</div>}
             </label>
 
             <label>

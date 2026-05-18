@@ -20,6 +20,8 @@ type ProfesionalFormValues = {
   mail: string;
   telefono: string;
   fecha_nacimiento: string;
+  codigo: string;
+  confirmar_codigo: string;
   servicios: number[];
   horarios: HorarioAdmin[];
   disponibilidades: DisponibilidadServicioAdmin[];
@@ -56,37 +58,52 @@ function isDisponibilidadInsideHorarioBase(disponibilidad: HorarioAdmin, horario
   );
 }
 
-const profesionalSchema = yup.object({
-  nombre: yup.string().trim().required('El nombre es requerido'),
-  dni: yup
-    .string()
-    .required('El DNI es requerido')
-    .matches(/^\d+$/, 'El DNI debe contener solo numeros')
-    .min(7, 'El DNI debe tener al menos 7 digitos')
-    .max(8, 'El DNI no puede tener mas de 8 digitos'),
-  mail: yup.string().trim().email('Ingrese un email valido').required('El email es requerido'),
-  telefono: yup
-    .string()
-    .required('El telefono es requerido')
-    .matches(/^\d+$/, 'El telefono debe contener solo numeros'),
-  fecha_nacimiento: yup.string().required('La fecha de nacimiento es requerida'),
-  servicios: yup.array().of(yup.number().required()).min(1, 'Debe seleccionar al menos un servicio').required(),
-  horarios: yup.array().of(horarioSchema).min(1, 'Debe ingresar al menos un horario').required(),
-  disponibilidades: yup.array().of(disponibilidadSchema).optional().default([]),
-}).test('disponibilidades-dentro-horario-base', function (values) {
-  const horarios = values.horarios || [];
-  const disponibilidades = values.disponibilidades || [];
-  const invalidIndex = disponibilidades.findIndex(
-    (disponibilidad) => !isDisponibilidadInsideHorarioBase(disponibilidad, horarios),
-  );
+const codigoSchema = yup
+  .string()
+  .trim()
+  .matches(/^\d*$/, 'El codigo debe contener solo numeros');
 
-  if (invalidIndex === -1) return true;
+function profesionalSchema(isEdit: boolean) {
+  return yup.object({
+    nombre: yup.string().trim().required('El nombre es requerido'),
+    dni: yup
+      .string()
+      .required('El DNI es requerido')
+      .matches(/^\d+$/, 'El DNI debe contener solo numeros')
+      .min(7, 'El DNI debe tener al menos 7 digitos')
+      .max(8, 'El DNI no puede tener mas de 8 digitos'),
+    mail: yup.string().trim().email('Ingrese un email valido').required('El email es requerido'),
+    telefono: yup
+      .string()
+      .required('El telefono es requerido')
+      .matches(/^\d+$/, 'El telefono debe contener solo numeros'),
+    fecha_nacimiento: yup.string().required('La fecha de nacimiento es requerida'),
+    codigo: isEdit
+      ? codigoSchema.default('')
+      : codigoSchema.required('El codigo de acceso es requerido').matches(/^\d+$/, 'El codigo debe contener solo numeros'),
+    confirmar_codigo: yup.string().default('').test('matches-code', 'Los codigos no coinciden', function (value) {
+      const codigo = this.parent.codigo;
+      if (!codigo && isEdit) return true;
+      return value === codigo;
+    }),
+    servicios: yup.array().of(yup.number().required()).min(1, 'Debe seleccionar al menos un servicio').required(),
+    horarios: yup.array().of(horarioSchema).min(1, 'Debe ingresar al menos un horario').required(),
+    disponibilidades: yup.array().of(disponibilidadSchema).optional().default([]),
+  }).test('disponibilidades-dentro-horario-base', function (values) {
+    const horarios = values.horarios || [];
+    const disponibilidades = values.disponibilidades || [];
+    const invalidIndex = disponibilidades.findIndex(
+      (disponibilidad) => !isDisponibilidadInsideHorarioBase(disponibilidad, horarios),
+    );
 
-  return this.createError({
-    path: `disponibilidades.${invalidIndex}.hora_fin`,
-    message: 'La disponibilidad especifica debe estar dentro de un horario base del mismo dia.',
+    if (invalidIndex === -1) return true;
+
+    return this.createError({
+      path: `disponibilidades.${invalidIndex}.hora_fin`,
+      message: 'La disponibilidad especifica debe estar dentro de un horario base del mismo dia.',
+    });
   });
-});
+}
 
 function horarioLabel(horario: HorarioAdmin) {
   if (Number(horario.dia) === -1) return `Lunes a viernes ${toTime(horario.hora_inicio)}-${toTime(horario.hora_fin)}`;
@@ -281,13 +298,15 @@ function ProfesionalModal({
     reset,
   } = useForm<ProfesionalFormValues>({
     mode: 'onChange',
-    resolver: yupResolver(profesionalSchema),
+    resolver: yupResolver(profesionalSchema(Boolean(data))),
     defaultValues: {
       nombre: '',
       dni: '',
       mail: '',
       telefono: '',
       fecha_nacimiento: '',
+      codigo: '',
+      confirmar_codigo: '',
       servicios: [],
       horarios: [createBlankHorario()],
       disponibilidades: [],
@@ -325,6 +344,8 @@ function ProfesionalModal({
       mail: data?.mail || '',
       telefono: data?.telefono?.toString() || '',
       fecha_nacimiento: data?.fecha_nacimiento || '',
+      codigo: '',
+      confirmar_codigo: '',
       servicios: data?.servicios.map((servicio) => servicio.id_servicio) || [],
       horarios: data?.horarios.length ? data.horarios : [createBlankHorario()],
       disponibilidades: data?.disponibilidades || [],
@@ -342,19 +363,20 @@ function ProfesionalModal({
           mail: values.mail,
           telefono: Number(values.telefono),
           fecha_nacimiento: values.fecha_nacimiento,
+          ...(values.codigo ? { codigo: Number(values.codigo) } : {}),
           servicios: selectedServiceIds,
           horarios: horarios.map((horario) => ({
             ...horario,
             dia: Number(horario.dia),
           })),
           disponibilidades: (values.disponibilidades || [])
-            .map((disponibilidad) => ({
+            .map((disponibilidad: DisponibilidadServicioAdmin) => ({
               ...disponibilidad,
               id_servicio: Number(disponibilidad.id_servicio),
               dia: Number(disponibilidad.dia),
             }))
-            .filter((disponibilidad) => selectedServiceIds.includes(disponibilidad.id_servicio)),
-        };
+            .filter((disponibilidad: DisponibilidadServicioAdmin) => selectedServiceIds.includes(disponibilidad.id_servicio)),
+      };
 
         if (data) await adminApi.updateProfesional(data.id_profesional, payload);
         else await adminApi.createProfesional(payload);
@@ -433,6 +455,30 @@ function ProfesionalModal({
               />
               {errors.fecha_nacimiento && <div className="invalid-feedback">{errors.fecha_nacimiento.message}</div>}
             </label>
+
+            {!readOnly && (
+              <>
+                <label>
+                  {data ? 'Nuevo codigo de acceso' : 'Codigo de acceso'}
+                  <input
+                    className={`form-control ${errors.codigo ? 'is-invalid' : ''}`}
+                    type="number"
+                    {...register('codigo')}
+                  />
+                  {errors.codigo && <div className="invalid-feedback">{errors.codigo.message}</div>}
+                </label>
+
+                <label>
+                  Confirmar codigo
+                  <input
+                    className={`form-control ${errors.confirmar_codigo ? 'is-invalid' : ''}`}
+                    type="number"
+                    {...register('confirmar_codigo')}
+                  />
+                  {errors.confirmar_codigo && <div className="invalid-feedback">{errors.confirmar_codigo.message}</div>}
+                </label>
+              </>
+            )}
           </div>
 
           <h3 className="admin-modal-subtitle">Servicios</h3>

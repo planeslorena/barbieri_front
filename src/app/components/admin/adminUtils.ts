@@ -32,3 +32,21 @@ export function formatDateTime(value: string) {
     timeStyle: 'short',
   });
 }
+
+export function calculateAge(fechaNacimiento?: string | null) {
+  if (!fechaNacimiento) return '-';
+
+  const [year, month, day] = fechaNacimiento.slice(0, 10).split('-').map(Number);
+  if (!year || !month || !day) return '-';
+
+  const currentDate = new Date();
+  let age = currentDate.getFullYear() - year;
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentDay = currentDate.getDate();
+
+  if (currentMonth < month || (currentMonth === month && currentDay < day)) {
+    age -= 1;
+  }
+
+  return age >= 0 ? age : '-';
+}

@@ -3,6 +3,7 @@
   ClienteAdmin,
   ProfesionalAdmin,
   ServicioAdmin,
+  UsuarioAdmin,
 } from '@/app/types/admin';
 
 export interface CommonPanelProps {
@@ -10,5 +11,6 @@ export interface CommonPanelProps {
   categorias: CategoriaServicioAdmin[];
   profesionales: ProfesionalAdmin[];
   clientes: ClienteAdmin[];
+  administradores: UsuarioAdmin[];
   reloadAll: () => Promise<void>;
 }

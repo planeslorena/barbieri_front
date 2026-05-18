@@ -5,12 +5,13 @@ import { useCallback, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { Menu } from '@/app/components/Navbar/navbar';
 import { AgendaAdminPanel } from '@/app/components/admin/AgendaAdminPanel';
+import { AdministradoresPanel } from '@/app/components/admin/AdministradoresPanel';
 import { BloqueosPanel } from '@/app/components/admin/BloqueosPanel';
 import { ClientesPanel } from '@/app/components/admin/ClientesPanel';
 import { ProfesionalesPanel } from '@/app/components/admin/ProfesionalesPanel';
 import { ServiciosPanel } from '@/app/components/admin/ServiciosPanel';
 import { adminApi } from '@/app/services/admin';
-import type { CategoriaServicioAdmin, ClienteAdmin, ProfesionalAdmin, ServicioAdmin } from '@/app/types/admin';
+import type { CategoriaServicioAdmin, ClienteAdmin, ProfesionalAdmin, ServicioAdmin, UsuarioAdmin } from '@/app/types/admin';
 import './page.css';
 
 export default function Admin() {
@@ -20,19 +21,22 @@ export default function Admin() {
     const [servicios, setServicios] = useState<ServicioAdmin[]>([]);
     const [categorias, setCategorias] = useState<CategoriaServicioAdmin[]>([]);
     const [clientes, setClientes] = useState<ClienteAdmin[]>([]);
+    const [administradores, setAdministradores] = useState<UsuarioAdmin[]>([]);
 
     const reloadAll = useCallback(async () => {
-        const [profesionalesResp, serviciosResp, categoriasResp, clientesResp] = await Promise.all([
+        const [profesionalesResp, serviciosResp, categoriasResp, clientesResp, administradoresResp] = await Promise.all([
             adminApi.getProfesionales(),
             adminApi.getServicios(),
             adminApi.getCategorias(),
             adminApi.getClientes(),
+            adminApi.getAdministradores(),
         ]);
 
         setProfesionales(profesionalesResp);
         setServicios(serviciosResp);
         setCategorias(categoriasResp);
         setClientes(clientesResp);
+        setAdministradores(administradoresResp);
     }, []);
 
     useEffect(() => {
@@ -46,6 +50,7 @@ export default function Admin() {
         servicios,
         categorias,
         clientes,
+        administradores,
         reloadAll,
     };
 
@@ -64,10 +69,11 @@ export default function Admin() {
                         <div className="admin-tabs" role="tablist" aria-label="Secciones admin">
                             {[
                                 ['agenda', 'Agenda'],
+                                ['clientes', 'Pacientes'],
                                 ['profesionales', 'Profesionales'],
                                 ['servicios', 'Servicios'],
-                                ['clientes', 'Clientes'],
                                 ['bloqueos', 'Bloqueos'],
+                                ['administradores', 'Administradores'],
                             ].map(([key, label]) => (
                                 <button
                                     key={key}
@@ -97,6 +103,7 @@ export default function Admin() {
                     {!loading && activeTab === 'servicios' && <ServiciosPanel {...commonProps} />}
                     {!loading && activeTab === 'clientes' && <ClientesPanel {...commonProps} />}
                     {!loading && activeTab === 'bloqueos' && <BloqueosPanel {...commonProps} />}
+                    {!loading && activeTab === 'administradores' && <AdministradoresPanel {...commonProps} />}
                 </section>
             </main>
         </>

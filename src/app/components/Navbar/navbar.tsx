@@ -5,11 +5,14 @@ import Container from 'react-bootstrap/Container';
 import './navbar.css';
 import { usePathname, useRouter } from 'next/navigation';
 import { NavDropdown } from 'react-bootstrap';
+import { LogoutButton } from '@/app/components/auth/LogoutButton';
 
 export function Menu() {
     const router = useRouter();
     const pathname = usePathname();
-    const hideBookingButton = pathname?.startsWith('/admin');
+    const showLogoutButton = pathname?.startsWith('/admin')
+        || pathname?.startsWith('/profesional')
+        || pathname?.startsWith('/client');
 
     return (
         <Navbar expand="lg" className="nav-bar px-5">
@@ -41,7 +44,9 @@ export function Menu() {
                         <Nav.Link className="mx-2" onClick={() => { router.push('/home#testimonios') }}>Testimonios</Nav.Link>
                         <Nav.Link className="mx-2" onClick={() => { router.push('/home#contacto') }}>Contacto</Nav.Link>
                     </Nav>
-                    {!hideBookingButton && (
+                    {showLogoutButton ? (
+                        <LogoutButton className="ms-auto mx-2" />
+                    ) : (
                         <button
                             className="btn-style btn-iniciar-sesion ms-auto mx-2"
                         >

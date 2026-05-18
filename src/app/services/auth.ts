@@ -1,6 +1,11 @@
 import { AxiosResponse } from 'axios';
 import clientAxios from './axios';
 
+export const logout = async () => {
+    const { data } = await clientAxios.post('auth/logout');
+    return data;
+}
+
 
 export const login = async (data: any) => {
     try {
@@ -19,9 +24,16 @@ export const login = async (data: any) => {
 export interface RegisterPayload {
   nombre: string;
   dni: number;
-  mail: string;
   telefono: number;
   fecha_nacimiento: string;
+  id_obra_social: number;
+  numero_obra_social: string;
+}
+
+export interface ObraSocial {
+  id_obra_social: number;
+  nombre: string;
+  activo: boolean;
 }
  
 // ─── Service ──────────────────────────────────────────────────────────────────
@@ -41,4 +53,9 @@ export const registerUser = async (payload: RegisterPayload) => {
       data: null,
     };
   }
+};
+
+export const getObrasSociales = async () => {
+  const { data } = await clientAxios.get<ObraSocial[]>('/obras-sociales');
+  return data;
 };

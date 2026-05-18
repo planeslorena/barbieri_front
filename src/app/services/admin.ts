@@ -3,21 +3,33 @@ import type {
   BloqueoAdmin,
   CategoriaServicioAdmin,
   ClienteAdmin,
+  ObraSocialAdmin,
   ProfesionalAdmin,
   ServicioAdmin,
   TurnoAdmin,
+  UsuarioAdmin,
 } from '@/app/types/admin';
 
 export type ProfesionalPayload = Omit<ProfesionalAdmin, 'id_profesional' | 'usuario' | 'servicios'> & {
   servicios: number[];
+  codigo?: number;
+};
+
+export type AdministradorPayload = {
+  nombre: string;
+  dni: number;
+  mail: string;
+  telefono: number;
+  codigo?: number;
 };
 
 export type ClientePayload = {
   nombre: string;
   dni: number;
-  mail: string;
   telefono: number;
   fecha_nacimiento: string;
+  id_obra_social: number;
+  numero_obra_social: string;
 };
 
 export type ServicioPayload = {
@@ -77,6 +89,26 @@ export const adminApi = {
     const { data } = await clientAxios.patch<ProfesionalAdmin>(`/profesionales/${id}/restaurar`);
     return data;
   },
+  getAdministradores: async () => {
+    const { data } = await clientAxios.get<UsuarioAdmin[]>('/usuarios/administradores');
+    return data;
+  },
+  createAdministrador: async (payload: AdministradorPayload) => {
+    const { data } = await clientAxios.post<UsuarioAdmin>('/usuarios/administradores', payload);
+    return data;
+  },
+  updateAdministrador: async (id: number, payload: AdministradorPayload) => {
+    const { data } = await clientAxios.patch<UsuarioAdmin>(`/usuarios/administradores/${id}`, payload);
+    return data;
+  },
+  deleteAdministrador: async (id: number) => {
+    const { data } = await clientAxios.delete(`/usuarios/administradores/${id}`);
+    return data;
+  },
+  restoreAdministrador: async (id: number) => {
+    const { data } = await clientAxios.patch<UsuarioAdmin>(`/usuarios/administradores/${id}/restaurar`);
+    return data;
+  },
   getServicios: async () => {
     const { data } = await clientAxios.get<ServicioAdmin[]>('/servicios');
     return data;
@@ -113,6 +145,10 @@ export const adminApi = {
     const { data } = await clientAxios.get<ClienteAdmin[]>('/clientes');
     return data;
   },
+  getObrasSociales: async () => {
+    const { data } = await clientAxios.get<ObraSocialAdmin[]>('/obras-sociales');
+    return data;
+  },
   createCliente: async (payload: ClientePayload) => {
     const { data } = await clientAxios.post<ClienteAdmin>('/clientes', payload);
     return data;
@@ -141,7 +177,7 @@ export const adminApi = {
     const { data } = await clientAxios.patch<TurnoAdmin>(`/turnos/admin/${id}/pago-reserva`, { reserva_pagada });
     return data;
   },
-  getBloqueos: async (params: { desde: string; hasta: string; id_profesional?: number }) => {
+  getBloqueos: async (params: { desde?: string; hasta?: string; id_profesional?: number }) => {
     const { data } = await clientAxios.get<BloqueoAdmin[]>('/bloqueos', { params });
     return data;
   },

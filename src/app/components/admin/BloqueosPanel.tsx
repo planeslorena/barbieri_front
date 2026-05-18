@@ -1,5 +1,5 @@
 'use client';
-/* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ColumnDef } from '@tanstack/react-table';
@@ -14,6 +14,12 @@ import { AdminDataTable } from './AdminDataTable';
 import type { CommonPanelProps } from './adminPanelTypes';
 import { apiMessage, today, toTime } from './adminUtils';
 
+type BloqueosApi = {
+  getBloqueos: typeof adminApi.getBloqueos;
+  createBloqueo: typeof adminApi.createBloqueo;
+  deleteBloqueo: typeof adminApi.deleteBloqueo;
+};
+
 type BloqueoFormValues = {
   id_profesional: string;
   fecha: string;
@@ -22,6 +28,8 @@ type BloqueoFormValues = {
   hora_fin: string | undefined;
   motivo: string;
 };
+
+const TODOS_LOS_PROFESIONALES = 'TODOS';
 
 const bloqueoSchema = yup.object({
   id_profesional: yup.string().required('Debe seleccionar un profesional'),
@@ -47,18 +55,25 @@ const bloqueoSchema = yup.object({
   motivo: yup.string().default(''),
 });
 
-export function BloqueosPanel({ profesionales, reloadAll }: CommonPanelProps) {
-  const [fecha, setFecha] = useState(today());
+export function BloqueosPanel({
+  profesionales,
+  reloadAll,
+  bloqueosApi = adminApi,
+  hideProfessionalSelect = false,
+}: CommonPanelProps & {
+  bloqueosApi?: BloqueosApi;
+  hideProfessionalSelect?: boolean;
+}) {
   const [bloqueos, setBloqueos] = useState<BloqueoAdmin[]>([]);
   const [modal, setModal] = useState(false);
 
   const load = async () => {
-    setBloqueos(await adminApi.getBloqueos({ desde: fecha, hasta: fecha }));
+    setBloqueos(await bloqueosApi.getBloqueos({ desde: today() }));
   };
 
   useEffect(() => {
     load().catch((error) => Swal.fire('Error', apiMessage(error), 'error'));
-  }, [fecha]);
+  }, []);
 
   const columns = useMemo<ColumnDef<BloqueoAdmin>[]>(
     () => [
@@ -92,7 +107,7 @@ export function BloqueosPanel({ profesionales, reloadAll }: CommonPanelProps) {
     if (!result.isConfirmed) return;
 
     try {
-      await adminApi.deleteBloqueo(bloqueo.id);
+      await bloqueosApi.deleteBloqueo(bloqueo.id);
       await load();
       await reloadAll();
       Swal.fire('Listo', 'Bloqueo eliminado.', 'success');
@@ -103,15 +118,6 @@ export function BloqueosPanel({ profesionales, reloadAll }: CommonPanelProps) {
 
   return (
     <>
-      <div className="admin-agenda-toolbar">
-        <input
-          className="form-control admin-date-input"
-          type="date"
-          value={fecha}
-          onChange={(event) => setFecha(event.target.value)}
-        />
-      </div>
-
       <AdminDataTable
         data={bloqueos}
         columns={columns}
@@ -123,8 +129,10 @@ export function BloqueosPanel({ profesionales, reloadAll }: CommonPanelProps) {
 
       <BloqueoModal
         show={modal}
-        fecha={fecha}
+        fecha={today()}
         profesionales={profesionales}
+        bloqueosApi={bloqueosApi}
+        hideProfessionalSelect={hideProfessionalSelect}
         onClose={() => setModal(false)}
         onSaved={async () => {
           await load();
@@ -139,15 +147,24 @@ function BloqueoModal({
   show,
   fecha,
   profesionales,
+  bloqueosApi,
+  hideProfessionalSelect,
   onClose,
   onSaved,
 }: {
   show: boolean;
   fecha: string;
   profesionales: ProfesionalAdmin[];
+  bloqueosApi: BloqueosApi;
+  hideProfessionalSelect: boolean;
   onClose: () => void;
   onSaved: () => Promise<void>;
 }) {
+  const profesionalesActivos = useMemo(
+    () => profesionales.filter((profesional) => !profesional.deletedAt),
+    [profesionales],
+  );
+
   const {
     control,
     formState: { errors, isSubmitting },
@@ -173,7 +190,7 @@ function BloqueoModal({
     if (!show) return;
 
     reset({
-      id_profesional: '',
+      id_profesional: hideProfessionalSelect ? String(profesionalesActivos[0]?.id_profesional || '') : '',
       fecha,
       tipo: 'DIA_COMPLETO',
       hora_inicio: '09:00',
@@ -184,14 +201,34 @@ function BloqueoModal({
 
   const submit = handleSubmit(async (values) => {
     try {
-      await adminApi.createBloqueo({
-        id_profesional: Number(values.id_profesional),
+      const bloqueo = {
         fecha: values.fecha,
         tipo: values.tipo,
         hora_inicio: values.tipo === 'RANGO_HORARIO' ? values.hora_inicio : undefined,
         hora_fin: values.tipo === 'RANGO_HORARIO' ? values.hora_fin : undefined,
         motivo: values.motivo || undefined,
-      });
+      };
+
+      if (values.id_profesional === TODOS_LOS_PROFESIONALES) {
+        if (profesionalesActivos.length === 0) {
+          await Swal.fire('Error', 'No hay profesionales activos para bloquear.', 'error');
+          return;
+        }
+
+        await Promise.all(
+          profesionalesActivos.map((profesional) =>
+            bloqueosApi.createBloqueo({
+              ...bloqueo,
+              id_profesional: profesional.id_profesional,
+            }),
+          ),
+        );
+      } else {
+        await bloqueosApi.createBloqueo({
+          ...bloqueo,
+          id_profesional: Number(values.id_profesional),
+        });
+      }
 
       await onSaved();
       onClose();
@@ -210,18 +247,21 @@ function BloqueoModal({
       <Modal.Body>
         <form id="bloqueo-admin-form" onSubmit={submit}>
           <div className="admin-form-grid">
-            <label>
-              Profesional
-              <select className={`form-select ${errors.id_profesional ? 'is-invalid' : ''}`} {...register('id_profesional')}>
-                <option value="">Seleccionar</option>
-                {profesionales.map((profesional) => (
-                  <option key={profesional.id_profesional} value={profesional.id_profesional}>
-                    {profesional.nombre}
-                  </option>
-                ))}
-              </select>
-              {errors.id_profesional && <div className="invalid-feedback">{errors.id_profesional.message}</div>}
-            </label>
+            {!hideProfessionalSelect && (
+              <label>
+                Profesional
+                <select className={`form-select ${errors.id_profesional ? 'is-invalid' : ''}`} {...register('id_profesional')}>
+                  <option value="">Seleccionar</option>
+                  <option value={TODOS_LOS_PROFESIONALES}>Todos los profesionales</option>
+                  {profesionalesActivos.map((profesional) => (
+                    <option key={profesional.id_profesional} value={profesional.id_profesional}>
+                      {profesional.nombre}
+                    </option>
+                  ))}
+                </select>
+                {errors.id_profesional && <div className="invalid-feedback">{errors.id_profesional.message}</div>}
+              </label>
+            )}
 
             <label>
               Fecha

@@ -1,38 +1,36 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import "./formRegistrarse.css";
-import { useContext } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { UserContext } from "@/app/context/user.context";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { registerUser } from "@/app/services/auth";
+import { getObrasSociales, ObraSocial, registerUser } from "@/app/services/auth";
 import Swal from "sweetalert2";
 
-
-// ─── Validation Schema ────────────────────────────────────────────────────────
-
 const schema = yup.object().shape({
-  nombre: yup
-    .string()
-    .required("El nombre y apellido son requeridos"),
+  nombre: yup.string().required("El nombre y apellido son requeridos"),
   dni: yup
     .string()
     .required("El DNI es requerido")
-    .matches(/^\d+$/, "El DNI debe contener solo números")
-    .min(7, "El DNI debe tener al menos 7 dígitos")
-    .max(8, "El DNI no puede tener más de 8 dígitos"),
-  mail: yup
-    .string()
-    .email("Ingresá un email válido")
-    .required("El email es requerido"),
+    .matches(/^\d+$/, "El DNI debe contener solo numeros")
+    .min(7, "El DNI debe tener al menos 7 digitos")
+    .max(8, "El DNI no puede tener mas de 8 digitos"),
   telefono: yup
     .string()
-    .required("El teléfono es requerido")
-    .matches(/^\d+$/, "El teléfono debe contener solo números"),
-  // En el schema de yup
+    .required("El telefono es requerido")
+    .matches(/^\d+$/, "El telefono debe contener solo numeros"),
+  id_obra_social: yup
+    .string()
+    .required("La obra social es requerida")
+    .matches(/^\d+$/, "Selecciona una obra social valida"),
+  numero_obra_social: yup
+    .string()
+    .trim()
+    .required("El numero de obra social es requerido"),
   fecha_nacimiento: yup
     .string()
     .required("La fecha de nacimiento es requerida")
-    .test("edad-minima", "Debés ser mayor de 15 años", (value) => {
+    .test("edad-minima", "Debes ser mayor de 15 anos", (value) => {
       if (!value) return false;
       const hoy = new Date();
       const nacimiento = new Date(value);
@@ -47,59 +45,79 @@ const schema = yup.object().shape({
       if (!value) return false;
       return new Date(value) < new Date();
     })
-    .test("edad-maxima", "Fecha de nacimiento inválida", (value) => {
+    .test("edad-maxima", "Fecha de nacimiento invalida", (value) => {
       if (!value) return false;
       const anioNacimiento = new Date(value).getFullYear();
       return anioNacimiento >= 1900;
     }),
 });
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface FormData {
   nombre: string;
   dni: string;
-  mail: string;
   telefono: string;
+  id_obra_social: string;
+  numero_obra_social: string;
   fecha_nacimiento: string;
 }
-
-// ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
   mostrarFormLogin: () => void;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
-export default function FormRegistrarse({
-  mostrarFormLogin,
-}: Props) {
+export default function FormRegistrarse({ mostrarFormLogin }: Props) {
   const { setUserData } = useContext(UserContext);
+  const [obrasSociales, setObrasSociales] = useState<ObraSocial[]>([]);
+  const [obraSocialQuery, setObraSocialQuery] = useState("");
+  const [showObraSocialOptions, setShowObraSocialOptions] = useState(false);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: yupResolver(schema) as any,
   });
 
-  // ─── Submit ──────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    getObrasSociales()
+      .then(setObrasSociales)
+      .catch(() => setObrasSociales([]));
+  }, []);
+
+  const filteredObrasSociales = useMemo(() => {
+    const query = obraSocialQuery.trim().toLowerCase();
+    if (!query) return obrasSociales;
+
+    return obrasSociales.filter((obraSocial) =>
+      obraSocial.nombre.toLowerCase().includes(query),
+    );
+  }, [obraSocialQuery, obrasSociales]);
+
+  const selectObraSocial = (obraSocial: ObraSocial) => {
+    setObraSocialQuery(obraSocial.nombre);
+    setValue("id_obra_social", obraSocial.id_obra_social.toString(), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setShowObraSocialOptions(false);
+  };
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     const resp = await registerUser({
       nombre: data.nombre,
       dni: Number(data.dni),
-      mail: data.mail,
       telefono: Number(data.telefono),
+      id_obra_social: Number(data.id_obra_social),
+      numero_obra_social: data.numero_obra_social,
       fecha_nacimiento: data.fecha_nacimiento,
     });
 
     if (resp.status === 409) {
       Swal.fire({
         title: `Hola ${data.nombre}!`,
-        text: "Tu DNI ya se encuentra registrado. Por favor, iniciá sesión para continuar.",
+        text: "Tu DNI ya se encuentra registrado. Por favor, inicia sesion para continuar.",
         icon: "error",
       });
       setUserData(null);
@@ -109,7 +127,7 @@ export default function FormRegistrarse({
 
     Swal.fire({
       title: `Hola ${data.nombre}!`,
-      text: "¡Ya podés empezar a disfrutar de nuestros servicios!",
+      text: "Ya podes empezar a disfrutar de nuestros servicios!",
       icon: "success",
     });
 
@@ -117,17 +135,12 @@ export default function FormRegistrarse({
     mostrarFormLogin();
   };
 
-  // ─── Render ──────────────────────────────────────────────────────────────────
-
   return (
     <div className="container container-form">
-
       <div className="d-flex flex-column align-items-center justify-content-center mb-3">
-        <h4 className="font-text">Creá tu cuenta</h4>
+        <h4 className="font-text">Crea tu cuenta</h4>
 
         <form id="register-form" onSubmit={handleSubmit(onSubmit)} className="cliente-form">
-
-          {/* Nombre */}
           <div className="form-group mb-2">
             <label>Nombre y Apellido</label>
             <input
@@ -135,12 +148,9 @@ export default function FormRegistrarse({
               className={`form-control ${errors.nombre ? "is-invalid" : ""}`}
               {...register("nombre")}
             />
-            {errors.nombre && (
-              <div className="invalid-feedback">{errors.nombre.message}</div>
-            )}
+            {errors.nombre && <div className="invalid-feedback">{errors.nombre.message}</div>}
           </div>
 
-          {/* DNI + Teléfono */}
           <div className="row mb-2">
             <div className="col">
               <label>DNI</label>
@@ -150,37 +160,71 @@ export default function FormRegistrarse({
                 className={`form-control ${errors.dni ? "is-invalid" : ""}`}
                 {...register("dni")}
               />
-              {errors.dni && (
-                <div className="invalid-feedback">{errors.dni.message}</div>
-              )}
+              {errors.dni && <div className="invalid-feedback">{errors.dni.message}</div>}
             </div>
             <div className="col">
-              <label>Teléfono</label>
+              <label>Telefono</label>
               <input
                 type="tel"
                 className={`form-control ${errors.telefono ? "is-invalid" : ""}`}
                 {...register("telefono")}
               />
-              {errors.telefono && (
-                <div className="invalid-feedback">{errors.telefono.message}</div>
-              )}
+              {errors.telefono && <div className="invalid-feedback">{errors.telefono.message}</div>}
             </div>
           </div>
 
-          {/* Email */}
           <div className="form-group mb-2">
-            <label>Email</label>
+            <label>Obra social</label>
+            <input type="hidden" {...register("id_obra_social")} />
             <input
-              type="email"
-              className={`form-control ${errors.mail ? "is-invalid" : ""}`}
-              {...register("mail")}
+              type="text"
+              autoComplete="off"
+              className={`form-control ${errors.id_obra_social ? "is-invalid" : ""}`}
+              placeholder="Buscar obra social o prepaga"
+              value={obraSocialQuery}
+              onChange={(event) => {
+                setObraSocialQuery(event.target.value);
+                setValue("id_obra_social", "", { shouldValidate: true });
+                setShowObraSocialOptions(true);
+              }}
+              onFocus={() => setShowObraSocialOptions(true)}
+              onBlur={() => setShowObraSocialOptions(false)}
             />
-            {errors.mail && (
-              <div className="invalid-feedback">{errors.mail.message}</div>
+            {showObraSocialOptions && (
+              <div className="obra-social-options">
+                {filteredObrasSociales.map((obraSocial) => (
+                  <button
+                    key={obraSocial.id_obra_social}
+                    type="button"
+                    className="obra-social-option"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => selectObraSocial(obraSocial)}
+                  >
+                    {obraSocial.nombre}
+                  </button>
+                ))}
+                {!filteredObrasSociales.length && (
+                  <span className="obra-social-empty">No hay resultados</span>
+                )}
+              </div>
+            )}
+            {errors.id_obra_social && (
+              <div className="invalid-feedback d-block">{errors.id_obra_social.message}</div>
             )}
           </div>
 
-          {/* Fecha de nacimiento — nuevo campo requerido por Cliente */}
+          <div className="form-group mb-2">
+            <label>Numero de obra social</label>
+            <input
+              type="text"
+              className={`form-control ${errors.numero_obra_social ? "is-invalid" : ""}`}
+              {...register("numero_obra_social")}
+            />
+            {errors.numero_obra_social && (
+              <div className="invalid-feedback">{errors.numero_obra_social.message}</div>
+            )}
+          </div>
+
           <div className="form-group mb-2">
             <label>Fecha de Nacimiento</label>
             <input
@@ -196,11 +240,11 @@ export default function FormRegistrarse({
           <button type="submit" className="btn-style" disabled={isSubmitting}>
             {isSubmitting ? "Guardando..." : "Guardar"}
           </button>
-          
         </form>
+
         <small className="text-registrarse " onClick={() => mostrarFormLogin()}>
-            <u className="text-registrarse">Ya tenes una cuenta? Inicia sesión</u>
-          </small>
+          <u className="text-registrarse">Ya tenes una cuenta? Inicia sesion</u>
+        </small>
       </div>
     </div>
   );

@@ -1,10 +1,17 @@
 export interface UsuarioAdmin {
   id_usuario: number;
+  deletedAt?: string | null;
   nombre: string;
   dni: number;
-  mail: string;
+  mail?: string | null;
   telefono: number;
   rol: 'ADMIN' | 'PROF' | 'USER';
+}
+
+export interface ObraSocialAdmin {
+  id_obra_social: number;
+  nombre: string;
+  activo: boolean;
 }
 
 export interface CategoriaServicioAdmin {
@@ -56,6 +63,8 @@ export interface ProfesionalAdmin {
 export interface ClienteAdmin {
   id_cliente: number;
   fecha_nacimiento: string;
+  obra_social?: ObraSocialAdmin | null;
+  numero_obra_social?: string | null;
   usuario: UsuarioAdmin;
   turnos?: TurnoAdmin[];
 }

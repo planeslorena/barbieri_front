@@ -5,6 +5,7 @@ import type { TurnoCliente } from '@/app/services/turnos';
 const SERVICIO_SIN_NOMBRE = 'Tratamiento';
 
 interface Props {
+  nombreUsuario?: string;
   turnos: TurnoCliente[];
   loading: boolean;
   error: string;
@@ -33,6 +34,7 @@ const puedeCancelar = (fechaHora: string) => {
 };
 
 export default function MisTurnos({
+  nombreUsuario,
   turnos,
   loading,
   error,
@@ -41,6 +43,8 @@ export default function MisTurnos({
   onReservar,
   onCancelar,
 }: Props) {
+  const agendaTitle = nombreUsuario ? `Agenda de ${nombreUsuario}` : 'Agenda';
+
   return (
     <section className="mis-turnos-card">
       <button className="turnos-refresh-btn" onClick={onRetry} aria-label="Actualizar turnos">
@@ -48,7 +52,7 @@ export default function MisTurnos({
       </button>
 
       <div className="turnos-heading mis-turnos-heading">
-        <span className="turnos-eyebrow">Agenda</span>
+        <span className="turnos-eyebrow">{agendaTitle}</span>
         <h1 className="title">Mis turnos</h1>
         <p>Consultá tus próximas reservas o agendá una nueva atención.</p>
       </div>

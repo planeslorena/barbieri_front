@@ -82,6 +82,40 @@ input[type=number] {
     line-height: 1.45;
 }
 
+.obra-social-options {
+    display: grid;
+    max-height: 12rem;
+    margin-top: 0.35rem;
+    overflow-y: auto;
+    border: 1px solid rgba(161, 141, 65, 0.24);
+    border-radius: 1rem;
+    background-color: #ffffff;
+    box-shadow: 0 12px 24px rgba(54, 53, 51, 0.1);
+}
+
+.obra-social-option {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 0;
+    border-bottom: 1px solid rgba(161, 141, 65, 0.12);
+    background-color: transparent;
+    color: var(--font-color);
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+.obra-social-option:hover,
+.obra-social-option:focus {
+    background-color: rgba(161, 141, 65, 0.1);
+    outline: none;
+}
+
+.obra-social-empty {
+    padding: 0.75rem 1rem;
+    color: #8f8b80;
+    font-size: 0.95rem;
+}
+
 #register-form .row {
     --bs-gutter-x: 0.9rem;
 }
@@ -152,6 +186,25 @@ input[type=number] {
 
     #register-form .invalid-feedback {
         color: #f0a7a2;
+    }
+
+    .obra-social-options {
+        border-color: rgba(161, 141, 65, 0.3);
+        background-color: #363533;
+    }
+
+    .obra-social-option {
+        border-bottom-color: rgba(161, 141, 65, 0.18);
+        color: #f2e0d5;
+    }
+
+    .obra-social-option:hover,
+    .obra-social-option:focus {
+        background-color: rgba(161, 141, 65, 0.16);
+    }
+
+    .obra-social-empty {
+        color: #b9b2aa;
     }
 }
 

@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { Menu } from "@/app/components/Navbar/navbar";
 import SeleccionProfesional from "@/app/components/turnos/SeleccionProfesional";
@@ -18,9 +18,11 @@ import {
     type TurnoCliente
 } from "@/app/services/turnos";
 import type { PasoTurno, SeleccionTurno } from "@/app/components/turnos/types";
+import { UserContext } from "@/app/context/user.context";
 import "./page.css";
 
 export default function Client() {
+    const { userData } = useContext(UserContext);
     const [vista, setVista] = useState<'mis-turnos' | 'reservar'>('mis-turnos');
     const [paso, setPaso] = useState<PasoTurno>('profesional');
     const [profesionales, setProfesionales] = useState<ProfesionalTurno[]>([]);
@@ -230,6 +232,7 @@ export default function Client() {
                 <div className="container px-3">
                     {vista === 'mis-turnos' && (
                         <MisTurnos
+                            nombreUsuario={userData?.nombre}
                             turnos={misTurnos}
                             loading={loadingMisTurnos}
                             error={errorMisTurnos}

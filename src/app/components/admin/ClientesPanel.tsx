@@ -8,16 +8,17 @@ import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import * as yup from 'yup';
 import { adminApi } from '@/app/services/admin';
-import type { ClienteAdmin } from '@/app/types/admin';
+import type { ClienteAdmin, ObraSocialAdmin } from '@/app/types/admin';
 import { AdminDataTable } from './AdminDataTable';
 import type { CommonPanelProps } from './adminPanelTypes';
-import { apiMessage, formatDateTime } from './adminUtils';
+import { apiMessage, calculateAge, formatDateTime } from './adminUtils';
 
 type ClienteFormValues = {
   nombre: string;
   dni: string;
-  mail: string;
   telefono: string;
+  id_obra_social: string;
+  numero_obra_social: string;
   fecha_nacimiento: string;
 };
 
@@ -29,11 +30,12 @@ const clienteSchema = yup.object({
     .matches(/^\d+$/, 'El DNI debe contener solo numeros')
     .min(7, 'El DNI debe tener al menos 7 digitos')
     .max(8, 'El DNI no puede tener mas de 8 digitos'),
-  mail: yup.string().trim().email('Ingrese un email valido').required('El email es requerido'),
   telefono: yup
     .string()
     .required('El telefono es requerido')
     .matches(/^\d+$/, 'El telefono debe contener solo numeros'),
+  id_obra_social: yup.string().required('La obra social es requerida'),
+  numero_obra_social: yup.string().trim().required('El numero de obra social es requerido'),
   fecha_nacimiento: yup.string().required('La fecha de nacimiento es requerida'),
 });
 
@@ -47,8 +49,10 @@ export function ClientesPanel({ clientes, reloadAll }: CommonPanelProps) {
       { header: 'Nro.', accessorKey: 'id_cliente' },
       { header: 'Nombre', cell: ({ row }) => row.original.usuario?.nombre },
       { header: 'DNI', cell: ({ row }) => row.original.usuario?.dni },
+      { header: 'Edad', cell: ({ row }) => calculateAge(row.original.fecha_nacimiento) },
       { header: 'Telefono', cell: ({ row }) => row.original.usuario?.telefono },
-      { header: 'Email', cell: ({ row }) => row.original.usuario?.mail },
+      { header: 'Obra social', cell: ({ row }) => row.original.obra_social?.nombre },
+      { header: 'Nro. obra social', accessorKey: 'numero_obra_social' },
       {
         header: 'Proximos turnos',
         cell: ({ row }) => row.original.turnos?.filter((turno) => turno.estado === 'CONFIRMADO').length || 0,
@@ -59,7 +63,7 @@ export function ClientesPanel({ clientes, reloadAll }: CommonPanelProps) {
 
   const removeCliente = async (cliente: ClienteAdmin) => {
     const result = await Swal.fire({
-      title: 'Eliminar cliente',
+      title: 'Eliminar paciente',
       text: cliente.usuario.nombre,
       icon: 'warning',
       showCancelButton: true,
@@ -71,7 +75,7 @@ export function ClientesPanel({ clientes, reloadAll }: CommonPanelProps) {
     try {
       await adminApi.deleteCliente(cliente.id_cliente);
       await reloadAll();
-      Swal.fire('Listo', 'Cliente eliminado.', 'success');
+      Swal.fire('Listo', 'Paciente eliminado.', 'success');
     } catch (error) {
       Swal.fire('Error', apiMessage(error), 'error');
     }
@@ -82,8 +86,8 @@ export function ClientesPanel({ clientes, reloadAll }: CommonPanelProps) {
       <AdminDataTable
         data={clientes}
         columns={columns}
-        searchPlaceholder="Buscar cliente"
-        createLabel="Agregar cliente"
+        searchPlaceholder="Buscar paciente"
+        createLabel="Agregar paciente"
         onCreate={() => setModal({ show: true })}
         onView={(row) => setModal({ show: true, data: row, readOnly: true })}
         onEdit={(row) => setModal({ show: true, data: row })}
@@ -125,11 +129,13 @@ function ClienteModal({
     defaultValues: {
       nombre: '',
       dni: '',
-      mail: '',
       telefono: '',
+      id_obra_social: '',
+      numero_obra_social: '',
       fecha_nacimiento: '',
     },
   });
+  const [obrasSociales, setObrasSociales] = useState<ObraSocialAdmin[]>([]);
 
   useEffect(() => {
     if (!show) return;
@@ -137,11 +143,21 @@ function ClienteModal({
     reset({
       nombre: data?.usuario?.nombre || '',
       dni: data?.usuario?.dni?.toString() || '',
-      mail: data?.usuario?.mail || '',
       telefono: data?.usuario?.telefono?.toString() || '',
+      id_obra_social: data?.obra_social?.id_obra_social?.toString() || '',
+      numero_obra_social: data?.numero_obra_social || '',
       fecha_nacimiento: data?.fecha_nacimiento || '',
     });
   }, [data, reset, show]);
+
+  useEffect(() => {
+    if (!show) return;
+
+    adminApi
+      .getObrasSociales()
+      .then(setObrasSociales)
+      .catch(() => setObrasSociales([]));
+  }, [show]);
 
   const submit = handleSubmit(async (values) => {
     try {
@@ -149,6 +165,7 @@ function ClienteModal({
         ...values,
         dni: Number(values.dni),
         telefono: Number(values.telefono),
+        id_obra_social: Number(values.id_obra_social),
       };
 
       if (data) await adminApi.updateCliente(data.id_cliente, payload);
@@ -156,7 +173,7 @@ function ClienteModal({
 
       await onSaved();
       onClose();
-      Swal.fire('Listo', 'Cliente guardado.', 'success');
+      Swal.fire('Listo', 'Paciente guardado.', 'success');
     } catch (error) {
       Swal.fire('Error', apiMessage(error), 'error');
     }
@@ -165,7 +182,7 @@ function ClienteModal({
   return (
     <Modal show={show} onHide={onClose} size="lg" scrollable backdrop="static">
       <Modal.Header closeButton>
-        <Modal.Title>{readOnly ? 'Ver cliente' : data ? 'Modificar cliente' : 'Agregar cliente'}</Modal.Title>
+        <Modal.Title>{readOnly ? 'Ver paciente' : data ? 'Modificar paciente' : 'Agregar paciente'}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -193,17 +210,6 @@ function ClienteModal({
             </label>
 
             <label>
-              Email
-              <input
-                className={`form-control ${errors.mail ? 'is-invalid' : ''}`}
-                readOnly={readOnly}
-                type="email"
-                {...register('mail')}
-              />
-              {errors.mail && <div className="invalid-feedback">{errors.mail.message}</div>}
-            </label>
-
-            <label>
               Telefono
               <input
                 className={`form-control ${errors.telefono ? 'is-invalid' : ''}`}
@@ -212,6 +218,35 @@ function ClienteModal({
                 {...register('telefono')}
               />
               {errors.telefono && <div className="invalid-feedback">{errors.telefono.message}</div>}
+            </label>
+
+            <label>
+              Obra social
+              <select
+                className={`form-control ${errors.id_obra_social ? 'is-invalid' : ''}`}
+                disabled={readOnly}
+                {...register('id_obra_social')}
+              >
+                <option value="">Seleccionar</option>
+                {obrasSociales.map((obraSocial) => (
+                  <option key={obraSocial.id_obra_social} value={obraSocial.id_obra_social}>
+                    {obraSocial.nombre}
+                  </option>
+                ))}
+              </select>
+              {errors.id_obra_social && <div className="invalid-feedback">{errors.id_obra_social.message}</div>}
+            </label>
+
+            <label>
+              Numero de obra social
+              <input
+                className={`form-control ${errors.numero_obra_social ? 'is-invalid' : ''}`}
+                readOnly={readOnly}
+                {...register('numero_obra_social')}
+              />
+              {errors.numero_obra_social && (
+                <div className="invalid-feedback">{errors.numero_obra_social.message}</div>
+              )}
             </label>
 
             <label>
