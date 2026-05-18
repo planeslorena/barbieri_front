@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const createClient = () => {
   const client = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    baseURL: 'http://localhost:8080', //process.env.NEXT_PUBLIC_API_URL,
     withCredentials: true,
   });
   return client;
