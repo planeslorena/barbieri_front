@@ -1,138 +1,251 @@
-import { useForm, SubmitHandler, set } from "react-hook-form"
-//import "./formRegistrarse.css"
-import { useContext, useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import "./formRegistrarse.css";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { UserContext } from "@/app/context/user.context";
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
-//import { createClient } from "@/app/services/client";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { getObrasSociales, ObraSocial, registerUser } from "@/app/services/auth";
 import Swal from "sweetalert2";
-//import { ICliente } from "@/app/model/ICliente";
 
-
- 
 const schema = yup.object().shape({
-  nombreApellido: yup.string().required('El nombre y apellido son requeridos'),
-  dni: yup.string()
-    .required('El DNI es requerido')
-    .matches(/^\d+$/, 'El DNI debe contener solo números')
-    .min(7, 'El DNI debe tener al menos 7 dígitos')
-    .max(8, 'El DNI no puede tener más de 8 dígitos'),
-  mail: yup.string().email('Ingrese un email válido').required('El email es requerido'),
-  telefono: yup.string().required('El teléfono es requerido'),
-})
+  nombre: yup.string().required("El nombre y apellido son requeridos"),
+  dni: yup
+    .string()
+    .required("El DNI es requerido")
+    .matches(/^\d+$/, "El DNI debe contener solo numeros")
+    .min(7, "El DNI debe tener al menos 7 digitos")
+    .max(8, "El DNI no puede tener mas de 8 digitos"),
+  telefono: yup
+    .string()
+    .required("El telefono es requerido")
+    .matches(/^\d+$/, "El telefono debe contener solo numeros"),
+  id_obra_social: yup
+    .string()
+    .required("La obra social es requerida")
+    .matches(/^\d+$/, "Selecciona una obra social valida"),
+  numero_obra_social: yup
+    .string()
+    .trim()
+    .required("El numero de obra social es requerido"),
+  fecha_nacimiento: yup
+    .string()
+    .required("La fecha de nacimiento es requerida")
+    .test("edad-minima", "Debes ser mayor de 15 anos", (value) => {
+      if (!value) return false;
+      const hoy = new Date();
+      const nacimiento = new Date(value);
+      const edad = hoy.getFullYear() - nacimiento.getFullYear();
+      const cumplioEsteAnio =
+        hoy.getMonth() > nacimiento.getMonth() ||
+        (hoy.getMonth() === nacimiento.getMonth() &&
+          hoy.getDate() >= nacimiento.getDate());
+      return edad > 15 || (edad === 15 && cumplioEsteAnio);
+    })
+    .test("no-futuro", "La fecha no puede ser en el futuro", (value) => {
+      if (!value) return false;
+      return new Date(value) < new Date();
+    })
+    .test("edad-maxima", "Fecha de nacimiento invalida", (value) => {
+      if (!value) return false;
+      const anioNacimiento = new Date(value).getFullYear();
+      return anioNacimiento >= 1900;
+    }),
+});
 
 interface FormData {
-  nombreApellido: string;
-  dni: number;
-  mail: string;
-  telefono: number;
+  nombre: string;
+  dni: string;
+  telefono: string;
+  id_obra_social: string;
+  numero_obra_social: string;
+  fecha_nacimiento: string;
 }
 
-export default function FormRegistrarse(props: any) {
-  const { setMostrarFormLogin, setMostrarFormRegistrarse, setMostrarMascotas, setMostrarUsuario }: { setMostrarFormLogin: Function, setMostrarFormRegistrarse: Function, setMostrarMascotas: Function, setMostrarUsuario: Function } = props;
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-    resolver: yupResolver(schema) as any
+interface Props {
+  mostrarFormLogin: () => void;
+}
+
+export default function FormRegistrarse({ mostrarFormLogin }: Props) {
+  const { setUserData } = useContext(UserContext);
+  const [obrasSociales, setObrasSociales] = useState<ObraSocial[]>([]);
+  const [obraSocialQuery, setObraSocialQuery] = useState("");
+  const [showObraSocialOptions, setShowObraSocialOptions] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
+    resolver: yupResolver(schema) as any,
   });
 
-  const { userData, setUserData } = useContext(UserContext);
+  useEffect(() => {
+    getObrasSociales()
+      .then(setObrasSociales)
+      .catch(() => setObrasSociales([]));
+  }, []);
 
-  const onSubmit = async (data: FormData) => {
-    const cliente = {
-      id_cliente: null,
-      nombre: data.nombreApellido,
-      dni: data.dni,
-      mail: data.mail,
-      telefono: data.telefono
-    };
-    const resp = 409//await createClient(cliente);
+  const filteredObrasSociales = useMemo(() => {
+    const query = obraSocialQuery.trim().toLowerCase();
+    if (!query) return obrasSociales;
 
-    if (resp == 409) {
-      Swal.fire({
-        title: `Hola ${cliente.nombre}!`,
-        text: "Tu DNI ya se encuentra registrado. Por favor, inicia sesión para continuar.",
-        icon: "error"
-      });
-      setUserData(null);
-      setMostrarFormRegistrarse(false);
-      setMostrarFormLogin(true);
-    } else {
-      Swal.fire({
-        title: `Hola ${cliente.nombre}!`,
-        text: "Ya podes empezar a disfrutar de nuestros servicios!",
-        icon: "success"
-      });
-      /*const id_newCliente = resp.raw.insertId;
+    return obrasSociales.filter((obraSocial) =>
+      obraSocial.nombre.toLowerCase().includes(query),
+    );
+  }, [obraSocialQuery, obrasSociales]);
 
-      const newCliente = {
-        ...cliente,
-        id_cliente: id_newCliente,
-      }
-      setUserData(newCliente);*/
-      setMostrarUsuario(false);
-      setMostrarFormRegistrarse(false);
-      setMostrarFormLogin(true);
-      setMostrarMascotas(true);
-    }
+  const selectObraSocial = (obraSocial: ObraSocial) => {
+    setObraSocialQuery(obraSocial.nombre);
+    setValue("id_obra_social", obraSocial.id_obra_social.toString(), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setShowObraSocialOptions(false);
   };
 
-  const irAtras = () => {
-    setMostrarFormLogin(true);
-    setMostrarFormRegistrarse(false);
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
+    const resp = await registerUser({
+      nombre: data.nombre,
+      dni: Number(data.dni),
+      telefono: Number(data.telefono),
+      id_obra_social: Number(data.id_obra_social),
+      numero_obra_social: data.numero_obra_social,
+      fecha_nacimiento: data.fecha_nacimiento,
+    });
+
+    if (resp.status === 409) {
+      Swal.fire({
+        title: `Hola ${data.nombre}!`,
+        text: "Tu DNI ya se encuentra registrado. Por favor, inicia sesion para continuar.",
+        icon: "error",
+      });
+      setUserData(null);
+      mostrarFormLogin();
+      return;
+    }
+
+    Swal.fire({
+      title: `Hola ${data.nombre}!`,
+      text: "Ya podes empezar a disfrutar de nuestros servicios!",
+      icon: "success",
+    });
+
+    setUserData(resp.data);
+    mostrarFormLogin();
   };
 
   return (
-
-    <div className="container">
-      <div className='d-flex flex-column align-items-start justify-content-start w-100'>
-        <i className="bi bi-arrow-left" onClick={irAtras}></i>
-      </div>
+    <div className="container container-form">
       <div className="d-flex flex-column align-items-center justify-content-center mb-3">
-        <h4 className="font-text">Registrate en Peluditos</h4>
+        <h4 className="font-text">Crea tu cuenta</h4>
 
-        <form id="pet-form" onSubmit={handleSubmit(onSubmit)} className="pet-form">
+        <form id="register-form" onSubmit={handleSubmit(onSubmit)} className="cliente-form">
           <div className="form-group mb-2">
             <label>Nombre y Apellido</label>
             <input
               type="text"
-              className={`form-control ${errors.nombreApellido ? 'is-invalid' : ''}`}
-              {...register('nombreApellido')}
+              className={`form-control ${errors.nombre ? "is-invalid" : ""}`}
+              {...register("nombre")}
             />
-            {errors.nombreApellido && <div className="invalid-feedback">{errors.nombreApellido.message}</div>}
+            {errors.nombre && <div className="invalid-feedback">{errors.nombre.message}</div>}
           </div>
 
           <div className="row mb-2">
             <div className="col">
               <label>DNI</label>
               <input
-                type="number"
-                className={`form-control ${errors.dni ? 'is-invalid' : ''}`}
-                {...register('dni')}
+                type="text"
+                inputMode="numeric"
+                className={`form-control ${errors.dni ? "is-invalid" : ""}`}
+                {...register("dni")}
               />
               {errors.dni && <div className="invalid-feedback">{errors.dni.message}</div>}
             </div>
             <div className="col">
-              <label>Teléfono</label>
+              <label>Telefono</label>
               <input
                 type="tel"
-                className={`form-control ${errors.telefono ? 'is-invalid' : ''}`}
-                {...register('telefono')}
+                className={`form-control ${errors.telefono ? "is-invalid" : ""}`}
+                {...register("telefono")}
               />
               {errors.telefono && <div className="invalid-feedback">{errors.telefono.message}</div>}
             </div>
           </div>
 
           <div className="form-group mb-2">
-            <label>Email</label>
+            <label>Obra social</label>
+            <input type="hidden" {...register("id_obra_social")} />
             <input
-              type="email"
-              className={`form-control ${errors.mail ? 'is-invalid' : ''}`}
-              {...register('mail')}
+              type="text"
+              autoComplete="off"
+              className={`form-control ${errors.id_obra_social ? "is-invalid" : ""}`}
+              placeholder="Buscar obra social o prepaga"
+              value={obraSocialQuery}
+              onChange={(event) => {
+                setObraSocialQuery(event.target.value);
+                setValue("id_obra_social", "", { shouldValidate: true });
+                setShowObraSocialOptions(true);
+              }}
+              onFocus={() => setShowObraSocialOptions(true)}
+              onBlur={() => setShowObraSocialOptions(false)}
             />
-            {errors.mail && <div className="invalid-feedback">{errors.mail.message}</div>}
+            {showObraSocialOptions && (
+              <div className="obra-social-options">
+                {filteredObrasSociales.map((obraSocial) => (
+                  <button
+                    key={obraSocial.id_obra_social}
+                    type="button"
+                    className="obra-social-option"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => selectObraSocial(obraSocial)}
+                  >
+                    {obraSocial.nombre}
+                  </button>
+                ))}
+                {!filteredObrasSociales.length && (
+                  <span className="obra-social-empty">No hay resultados</span>
+                )}
+              </div>
+            )}
+            {errors.id_obra_social && (
+              <div className="invalid-feedback d-block">{errors.id_obra_social.message}</div>
+            )}
           </div>
-          <button type="submit" className='btn-style'> Guardar</button>
+
+          <div className="form-group mb-2">
+            <label>Numero de obra social</label>
+            <input
+              type="text"
+              className={`form-control ${errors.numero_obra_social ? "is-invalid" : ""}`}
+              {...register("numero_obra_social")}
+            />
+            {errors.numero_obra_social && (
+              <div className="invalid-feedback">{errors.numero_obra_social.message}</div>
+            )}
+          </div>
+
+          <div className="form-group mb-2">
+            <label>Fecha de Nacimiento</label>
+            <input
+              type="date"
+              className={`form-control ${errors.fecha_nacimiento ? "is-invalid" : ""}`}
+              {...register("fecha_nacimiento")}
+            />
+            {errors.fecha_nacimiento && (
+              <div className="invalid-feedback">{errors.fecha_nacimiento.message}</div>
+            )}
+          </div>
+
+          <button type="submit" className="btn-style" disabled={isSubmitting}>
+            {isSubmitting ? "Guardando..." : "Guardar"}
+          </button>
         </form>
+
+        <small className="text-registrarse " onClick={() => mostrarFormLogin()}>
+          <u className="text-registrarse">Ya tenes una cuenta? Inicia sesion</u>
+        </small>
       </div>
-    </div >
-  )
+    </div>
+  );
 }

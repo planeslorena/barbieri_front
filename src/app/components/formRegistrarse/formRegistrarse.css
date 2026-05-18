@@ -1,0 +1,226 @@
+/* Quita los botones de incremento y decremento del input tipo number */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.font-text {
+    margin-bottom: 1.4rem;
+    font-family: var(--font-title);
+    font-size: clamp(2rem, 3.5vw, 2.5rem);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--font-color);
+    text-align: center;
+}
+
+.container-form {
+    width: min(100%, 34rem);
+    padding: clamp(2rem, 4vw, 3rem);
+    border: 1px solid rgba(161, 141, 65, 0.18);
+    border-radius: 2rem;
+    background:
+        radial-gradient(circle at top left, rgba(161, 141, 65, 0.12), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 248, 245, 0.98) 100%);
+    backdrop-filter: blur(12px);
+}
+
+#register-form label {
+    display: inline-block;
+    margin-bottom: 0.45rem;
+    color: var(--font-color);
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+#register-form .form-control {
+    min-height: 3rem;
+    padding: 0.5rem 1.1rem;
+    border: 1px solid rgba(161, 141, 65, 0.24);
+    border-radius: 1rem;
+    background-color: rgba(255, 255, 255, 0.92);
+    color: var(--font-color);
+    font-size: 1rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease, background-color 0.25s ease;
+}
+
+#register-form .form-control::placeholder {
+    color: #8f8b80;
+}
+
+#register-form .form-control:hover {
+    border-color: rgba(161, 141, 65, 0.4);
+    background-color: #ffffff;
+}
+
+#register-form .form-control:focus {
+    outline: none;
+    border-color: rgba(161, 141, 65, 0.58);
+    box-shadow: 0 0 0 0.3rem rgba(161, 141, 65, 0.14);
+    background-color: #ffffff;
+}
+
+#register-form .form-control.is-invalid {
+    border-color: rgba(156, 75, 73, 0.52);
+    background-image: none;
+}
+
+#register-form .form-control.is-invalid:focus {
+    border-color: rgba(156, 75, 73, 0.65);
+    box-shadow: 0 0 0 0.25rem rgba(156, 75, 73, 0.14);
+}
+
+#register-form .invalid-feedback {
+    margin-top: 0.35rem;
+    color: #9c4b49;
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+.obra-social-options {
+    display: grid;
+    max-height: 12rem;
+    margin-top: 0.35rem;
+    overflow-y: auto;
+    border: 1px solid rgba(161, 141, 65, 0.24);
+    border-radius: 1rem;
+    background-color: #ffffff;
+    box-shadow: 0 12px 24px rgba(54, 53, 51, 0.1);
+}
+
+.obra-social-option {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 0;
+    border-bottom: 1px solid rgba(161, 141, 65, 0.12);
+    background-color: transparent;
+    color: var(--font-color);
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+.obra-social-option:hover,
+.obra-social-option:focus {
+    background-color: rgba(161, 141, 65, 0.1);
+    outline: none;
+}
+
+.obra-social-empty {
+    padding: 0.75rem 1rem;
+    color: #8f8b80;
+    font-size: 0.95rem;
+}
+
+#register-form .row {
+    --bs-gutter-x: 0.9rem;
+}
+
+#register-form .btn-style {
+    width: 100%;
+    min-height: 3.5rem;
+    margin-top: 0.75rem;
+    border: none;
+    border-radius: 999px;
+    background-color: var(--color-primary);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 12px 24px rgba(161, 141, 65, 0.24);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+#register-form .btn-style:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 28px rgba(161, 141, 65, 0.3);
+    background-color: #8b7732;
+}
+
+#register-form .btn-style:focus-visible {
+    outline: none;
+    box-shadow:
+        0 16px 28px rgba(161, 141, 65, 0.3),
+        0 0 0 0.25rem rgba(161, 141, 65, 0.18);
+}
+
+#register-form .btn-style:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+    .container-form  {
+        border-color: rgba(161, 141, 65, 0.24);
+        background:
+            radial-gradient(circle at top left, rgba(161, 141, 65, 0.12), transparent 34%),
+            linear-gradient(180deg, rgba(54, 53, 51, 0.9) 0%, rgba(40, 40, 40, 0.94) 100%);
+        box-shadow:
+            0 24px 60px rgba(0, 0, 0, 0.28),
+            0 10px 24px rgba(161, 141, 65, 0.08);
+    }
+
+    #register-form label,
+    .font-text,
+    .bi-arrow-left {
+        color: #f2e0d5;
+    }
+
+    #register-form .form-control {
+        background-color: rgba(255, 255, 255, 0.04);
+        border-color: rgba(161, 141, 65, 0.3);
+        color: #f2e0d5;
+    }
+
+    #register-form .form-control::placeholder {
+        color: #b9b2aa;
+    }
+
+    #register-form .form-control:hover,
+    #register-form .form-control:focus {
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    #register-form .invalid-feedback {
+        color: #f0a7a2;
+    }
+
+    .obra-social-options {
+        border-color: rgba(161, 141, 65, 0.3);
+        background-color: #363533;
+    }
+
+    .obra-social-option {
+        border-bottom-color: rgba(161, 141, 65, 0.18);
+        color: #f2e0d5;
+    }
+
+    .obra-social-option:hover,
+    .obra-social-option:focus {
+        background-color: rgba(161, 141, 65, 0.16);
+    }
+
+    .obra-social-empty {
+        color: #b9b2aa;
+    }
+}
+
+@media (max-width: 768px) {
+    .container-form {
+        width: 100%;
+        padding: 1.75rem 1.25rem;
+        border-radius: 1.5rem;
+    }
+
+    #register-form .row {
+        --bs-gutter-x: 0;
+        gap: 0.5rem;
+    }
+
+    #register-form .col {
+        flex: 0 0 100%;
+    }
+}

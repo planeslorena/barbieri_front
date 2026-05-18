@@ -46,6 +46,28 @@ body {
   font-size: 16px;
 }
 
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.45rem;
+  padding: 0.45rem 0.95rem;
+  border: 1px solid rgba(156, 75, 73, 0.28);
+  border-radius: 7px;
+  background-color: rgba(156, 75, 73, 0.08);
+  color: #9c4b49;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.logout-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 html,
 body {
   max-width: 100vw;

@@ -1,0 +1,480 @@
+.admin-page {
+    min-height: 100vh;
+    background: #fbfaf8;
+    padding: 32px 16px 56px;
+}
+
+.admin-shell {
+    width: min(1280px, 100%);
+    margin: 0 auto;
+}
+
+.admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.admin-eyebrow {
+    display: block;
+    color: var(--color-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 1rem;
+    letter-spacing: 0;
+    margin-bottom: 4px;
+}
+
+.admin-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.admin-tabs-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.admin-tabs-row .admin-tabs {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-tab {
+    border: 1px solid rgba(161, 141, 65, 0.35);
+    background: white;
+    color: var(--font-color);
+    border-radius: 7px;
+    padding: 9px 16px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.admin-tab.active {
+    background: var(--color-primary);
+    color: white;
+}
+
+.admin-primary-btn {
+    background: var(--color-primary);
+}
+
+.admin-loading,
+.admin-table-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.admin-loading {
+    padding: 28px;
+}
+
+.admin-table-card {
+    padding: 16px;
+}
+
+.admin-table-toolbar,
+.admin-agenda-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.admin-search {
+    max-width: 360px;
+}
+
+.admin-date-input {
+    max-width: 180px;
+}
+
+.admin-professional-select {
+    max-width: 260px;
+}
+
+.admin-table {
+    margin-bottom: 0;
+    color: var(--font-color);
+}
+
+.admin-table thead th {
+    background: rgba(232, 225, 213, 0.45);
+    color: var(--font-color);
+    cursor: pointer;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.admin-table td {
+    vertical-align: middle;
+    font-size: 0.92rem;
+}
+
+.admin-table tr.admin-row-disabled td {
+    background: #f1f1f1;
+    color: #8a9096;
+}
+
+.admin-table tr.admin-row-disabled .admin-icon-btn {
+    background: #fafafa;
+    color: #6c7278;
+}
+
+.admin-row-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.admin-schedule-summary {
+    display: grid;
+    gap: 4px;
+    min-width: 260px;
+    max-width: 520px;
+}
+
+.admin-schedule-summary span {
+    overflow-wrap: anywhere;
+}
+
+.admin-schedule-summary strong {
+    color: var(--font-color);
+}
+
+.admin-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(38, 55, 64, 0.12);
+    border-radius: 7px;
+    background: white;
+}
+
+.admin-icon-btn:disabled {
+    opacity: 0.45;
+}
+
+.admin-refresh-btn {
+    flex: 0 0 auto;
+}
+
+.admin-refresh-btn .bi-arrow-clockwise {
+    color: var(--color-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+    -webkit-text-stroke: 0.45px currentColor;
+}
+
+.admin-icon-danger {
+    color: #b42318;
+}
+
+.admin-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 12px;
+    font-size: 0.9rem;
+}
+
+.admin-stack {
+    display: grid;
+    gap: 20px;
+}
+
+.admin-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.admin-form-grid label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--font-color);
+}
+
+.admin-patient-field {
+    display: grid;
+    gap: 8px;
+}
+
+.admin-combobox {
+    position: relative;
+}
+
+.admin-combobox-menu {
+    background: white;
+    border: 1px solid rgba(38, 55, 64, 0.14);
+    border-radius: 7px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+    left: 0;
+    max-height: 220px;
+    overflow-y: auto;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 4px);
+    z-index: 20;
+}
+
+.admin-combobox-menu button {
+    background: transparent;
+    border: 0;
+    color: var(--font-color);
+    display: grid;
+    gap: 2px;
+    padding: 9px 11px;
+    text-align: left;
+    width: 100%;
+}
+
+.admin-combobox-menu button:hover,
+.admin-combobox-menu button:focus {
+    background: #f4f0e9;
+}
+
+.admin-combobox-menu small,
+.admin-combobox-empty {
+    color: #6c7278;
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.admin-combobox-empty {
+    padding: 10px 11px;
+}
+
+.admin-span-2 {
+    grid-column: 1 / -1;
+}
+
+.admin-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.admin-checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 18px;
+}
+
+.admin-modal-subtitle {
+    color: var(--font-color);
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 22px 0 12px;
+}
+
+.admin-inline-row {
+    display: grid;
+    grid-template-columns: minmax(140px, 1fr) 140px 140px auto;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.admin-inline-row:has(select:first-child) {
+    grid-template-columns: minmax(160px, 1.5fr) minmax(120px, 1fr) 120px 120px auto;
+}
+
+.admin-list-item {
+    padding: 10px 12px;
+    border: 1px solid rgba(38, 55, 64, 0.1);
+    border-radius: 7px;
+    margin-top: 8px;
+}
+
+.admin-payment-note {
+    background: rgba(161, 141, 65, 0.12);
+    border-left: 4px solid var(--color-primary);
+    padding: 10px 12px;
+    border-radius: 7px;
+    margin-top: 14px;
+    color: var(--font-color);
+}
+
+.admin-agenda-wrap {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    overflow-x: auto;
+}
+
+.admin-agenda-table {
+    min-width: 980px;
+    margin-bottom: 0;
+}
+
+.admin-agenda-table th {
+    background: #f4f0e9;
+    color: var(--font-color);
+    white-space: nowrap;
+}
+
+.admin-hour-cell {
+    font-weight: 700;
+    color: var(--font-color);
+}
+
+.agenda-cell {
+    min-width: 125px;
+    cursor: pointer;
+    border-left: 1px solid rgba(38, 55, 64, 0.08);
+}
+
+.agenda-free {
+    background: white !important;
+    color: #4b8a64 !important;
+    font-weight: 500;
+}
+
+.agenda-busy {
+    background: #f3efe2 !important;
+    border-left: 4px solid var(--color-primary);
+}
+
+.agenda-overbooked {
+    background: #f0ead9 !important;
+}
+
+.agenda-overbook-item {
+    display: grid;
+    gap: 2px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(38, 55, 64, 0.14);
+}
+
+.agenda-overbook-item span {
+    width: fit-content;
+    border-radius: 7px;
+    background: rgba(180, 35, 24, 0.12);
+    color: #b42318;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    text-transform: uppercase;
+}
+
+.agenda-extra-badge {
+    display: block;
+    width: fit-content;
+    border-radius: 7px;
+    background: rgba(161, 141, 65, 0.18);
+    color: #8b7528;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    padding: 2px 7px;
+    text-transform: uppercase;
+}
+
+.agenda-service-deleted {
+    display: inline-block;
+    border-radius: 7px;
+    background: rgba(108, 117, 125, 0.14);
+    color: #6c7278;
+    font-size: 0.68rem;
+    font-weight: 700;
+    margin-left: 6px;
+    padding: 1px 6px;
+    text-transform: uppercase;
+}
+
+.agenda-overbook-item .agenda-extra-badge {
+    background: rgba(161, 141, 65, 0.18);
+    color: #8b7528;
+}
+
+.agenda-blocked {
+    background: #f1f1f1 !important;
+    color: #6c7278 !important;
+    cursor: default;
+}
+
+.agenda-blocked span {
+    display: block;
+    font-weight: 600;
+}
+
+.agenda-blocked small {
+    display: block;
+    color: #7b8288;
+    margin-top: 2px;
+}
+
+.agenda-out {
+    background: #fafafa !important;
+    color: #a0a7ad !important;
+    cursor: default;
+}
+
+@media (max-width: 768px) {
+    .admin-page {
+        padding: 20px 10px 44px;
+    }
+
+    .admin-header,
+    .admin-table-toolbar,
+    .admin-agenda-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-tabs-row {
+        align-items: center;
+        gap: 8px;
+    }
+
+    .admin-search,
+    .admin-professional-select,
+    .admin-date-input {
+        max-width: none;
+        width: 100%;
+    }
+
+    .admin-form-grid,
+    .admin-checkbox-grid,
+    .admin-inline-row,
+    .admin-inline-row:has(select:first-child) {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .admin-tab,
+    .admin-loading,
+    .admin-table-card,
+    .admin-agenda-wrap,
+    .admin-icon-btn {
+        background: rgb(66, 66, 66);
+    }
+
+    .admin-table thead th,
+    .admin-agenda-table th {
+        background: rgba(81, 80, 80, 0.7);
+    }
+
+    .admin-combobox-menu {
+        background: rgb(66, 66, 66);
+        border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .admin-combobox-menu button:hover,
+    .admin-combobox-menu button:focus {
+        background: rgba(255, 255, 255, 0.08);
+    }
+}
