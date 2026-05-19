@@ -63,9 +63,15 @@ export interface CrearTurnoResponse {
 
 export interface EstadoPagoTurno {
   id_turno: number;
+  fechaHora: string;
   estado: string;
   paymentStatus: string;
   confirmado: boolean;
+  profesional: {
+    id_profesional: number;
+    nombre: string;
+  };
+  servicio: ServicioTurno;
 }
 
 export const getProfesionalesConServicios = async () => {

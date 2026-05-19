@@ -31,6 +31,8 @@ export default function ConfirmarTurno({ seleccion, onReset, onSuccess }: Props)
       });
 
       if (response.pago?.initPoint) {
+        sessionStorage.setItem('ultimo_turno_pago_id', String(response.turno.id_turno));
+
         await Swal.fire({
           title: 'Tu horario queda reservado',
           text: 'Para confirmar el turno tenes que pagar la reserva. Te vamos a redirigir a Mercado Pago.',
