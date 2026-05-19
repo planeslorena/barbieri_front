@@ -14,6 +14,16 @@ import { adminApi } from '@/app/services/admin';
 import type { CategoriaServicioAdmin, ClienteAdmin, ProfesionalAdmin, ServicioAdmin, UsuarioAdmin } from '@/app/types/admin';
 import './page.css';
 
+const loadAdminResource = async <T,>(label: string, request: () => Promise<T>) => {
+    try {
+        return await request();
+    } catch (error: any) {
+        const status = error?.response?.status;
+        const detail = status ? `${label} (${status})` : label;
+        throw new Error(`No se pudieron cargar: ${detail}`);
+    }
+};
+
 export default function Admin() {
     const [activeTab, setActiveTab] = useState('agenda');
     const [loading, setLoading] = useState(true);
@@ -25,11 +35,11 @@ export default function Admin() {
 
     const reloadAll = useCallback(async () => {
         const [profesionalesResp, serviciosResp, categoriasResp, clientesResp, administradoresResp] = await Promise.all([
-            adminApi.getProfesionales(),
-            adminApi.getServicios(),
-            adminApi.getCategorias(),
-            adminApi.getClientes(),
-            adminApi.getAdministradores(),
+            loadAdminResource('profesionales', adminApi.getProfesionales),
+            loadAdminResource('servicios', adminApi.getServicios),
+            loadAdminResource('categorias', adminApi.getCategorias),
+            loadAdminResource('pacientes', adminApi.getClientes),
+            loadAdminResource('administradores', adminApi.getAdministradores),
         ]);
 
         setProfesionales(profesionalesResp);
@@ -41,7 +51,7 @@ export default function Admin() {
 
     useEffect(() => {
         reloadAll()
-            .catch(() => Swal.fire('Error', 'No se pudieron cargar los datos del administrador.', 'error'))
+            .catch((error) => Swal.fire('Error', error.message || 'No se pudieron cargar los datos del administrador.', 'error'))
             .finally(() => setLoading(false));
     }, [reloadAll]);
 
