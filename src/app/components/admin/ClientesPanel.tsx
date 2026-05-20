@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { ColumnDef } from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { useForm, useWatch } from 'react-hook-form';
+import { Resolver, useForm, useWatch } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import * as yup from 'yup';
 import { adminApi } from '@/app/services/admin';
@@ -141,7 +141,7 @@ function ClienteModal({
     setValue,
   } = useForm<ClienteFormValues>({
     mode: 'onChange',
-    resolver: yupResolver(clienteSchema),
+    resolver: yupResolver(clienteSchema) as Resolver<ClienteFormValues>,
     defaultValues: {
       nombre: '',
       dni: '',
