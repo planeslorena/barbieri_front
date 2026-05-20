@@ -1,4 +1,4 @@
-import { useForm, SubmitHandler } from "react-hook-form";
+import { Resolver, useForm, SubmitHandler, useWatch } from "react-hook-form";
 import "./formRegistrarse.css";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { UserContext } from "@/app/context/user.context";
@@ -25,8 +25,7 @@ const schema = yup.object().shape({
     .matches(/^\d+$/, "Selecciona una obra social valida"),
   numero_obra_social: yup
     .string()
-    .trim()
-    .required("El numero de obra social es requerido"),
+    .trim(),
   fecha_nacimiento: yup
     .string()
     .required("La fecha de nacimiento es requerida")
@@ -72,13 +71,21 @@ export default function FormRegistrarse({ mostrarFormLogin }: Props) {
   const [showObraSocialOptions, setShowObraSocialOptions] = useState(false);
 
   const {
+    control,
     register,
     handleSubmit,
+    setError,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as Resolver<FormData>,
   });
+  const selectedObraSocialId = useWatch({ control, name: "id_obra_social" });
+  const selectedObraSocial = useMemo(
+    () => obrasSociales.find((obraSocial) => obraSocial.id_obra_social === Number(selectedObraSocialId)),
+    [obrasSociales, selectedObraSocialId],
+  );
+  const isParticular = selectedObraSocial?.nombre.trim().toLowerCase() === "particular";
 
   useEffect(() => {
     getObrasSociales()
@@ -101,16 +108,27 @@ export default function FormRegistrarse({ mostrarFormLogin }: Props) {
       shouldDirty: true,
       shouldValidate: true,
     });
+    if (obraSocial.nombre.trim().toLowerCase() === "particular") {
+      setValue("numero_obra_social", "", { shouldDirty: true, shouldValidate: true });
+    }
     setShowObraSocialOptions(false);
   };
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
+    if (!isParticular && !data.numero_obra_social.trim()) {
+      setError("numero_obra_social", {
+        type: "manual",
+        message: "El numero de obra social es requerido",
+      });
+      return;
+    }
+
     const resp = await registerUser({
       nombre: data.nombre,
       dni: Number(data.dni),
       telefono: Number(data.telefono),
       id_obra_social: Number(data.id_obra_social),
-      numero_obra_social: data.numero_obra_social,
+      numero_obra_social: isParticular ? null : data.numero_obra_social.trim(),
       fecha_nacimiento: data.fecha_nacimiento,
     });
 
@@ -213,17 +231,19 @@ export default function FormRegistrarse({ mostrarFormLogin }: Props) {
             )}
           </div>
 
-          <div className="form-group mb-2">
-            <label>Numero de obra social</label>
-            <input
-              type="text"
-              className={`form-control ${errors.numero_obra_social ? "is-invalid" : ""}`}
-              {...register("numero_obra_social")}
-            />
-            {errors.numero_obra_social && (
-              <div className="invalid-feedback">{errors.numero_obra_social.message}</div>
-            )}
-          </div>
+          {!isParticular && (
+            <div className="form-group mb-2">
+              <label>Numero de obra social</label>
+              <input
+                type="text"
+                className={`form-control ${errors.numero_obra_social ? "is-invalid" : ""}`}
+                {...register("numero_obra_social")}
+              />
+              {errors.numero_obra_social && (
+                <div className="invalid-feedback">{errors.numero_obra_social.message}</div>
+              )}
+            </div>
+          )}
 
           <div className="form-group mb-2">
             <label>Fecha de Nacimiento</label>

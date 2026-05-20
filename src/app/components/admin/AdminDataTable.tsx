@@ -16,6 +16,7 @@ import { useState } from 'react';
 interface AdminDataTableProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
+  tableClassName?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
   isDeleted?: (row: T) => boolean;
@@ -30,6 +31,7 @@ interface AdminDataTableProps<T> {
 export function AdminDataTable<T>({
   data,
   columns,
+  tableClassName,
   searchPlaceholder = 'Buscar',
   emptyMessage = 'No hay datos para mostrar.',
   isDeleted,
@@ -106,7 +108,7 @@ export function AdminDataTable<T>({
       </div>
 
       <div className="table-responsive">
-        <table className="table admin-table align-middle">
+        <table className={`table admin-table align-middle ${tableClassName || ''}`}>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>

@@ -112,6 +112,7 @@ export function ServiciosPanel({ servicios, categorias, reloadAll }: CommonPanel
       <AdminDataTable
         data={servicios}
         columns={serviceColumns}
+        tableClassName="admin-services-table"
         searchPlaceholder="Buscar servicio"
         createLabel="Agregar servicio"
         onCreate={() => setServicioModal({ show: true })}
@@ -122,6 +123,7 @@ export function ServiciosPanel({ servicios, categorias, reloadAll }: CommonPanel
       <AdminDataTable
         data={categorias}
         columns={categoryColumns}
+        tableClassName="admin-categories-table"
         searchPlaceholder="Buscar categoria"
         createLabel="Agregar categoria"
         onCreate={() => setCategoriaModal({ show: true })}

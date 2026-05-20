@@ -188,7 +188,7 @@ export default function Client() {
             await cargarMisTurnos();
             Swal.fire({
                 title: 'Turno cancelado',
-                text: 'Tu turno fue cancelado correctamente.',
+                text: 'Comunicate con el administrador para información de devolución de reserva.',
                 icon: 'success',
                 confirmButtonColor: '#a18d41',
             });

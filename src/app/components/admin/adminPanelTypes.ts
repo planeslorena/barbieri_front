@@ -13,4 +13,5 @@ export interface CommonPanelProps {
   clientes: ClienteAdmin[];
   administradores: UsuarioAdmin[];
   reloadAll: () => Promise<void>;
+  refreshKey?: number;
 }

@@ -11,20 +11,28 @@ interface Data {
     codigo?: number;
 }
 
-export default function FormLogin(props: any) {
-    const { mostrarFormRegistrarse }: { mostrarFormRegistrarse: Function } = props;
+interface FormLoginProps {
+    mostrarFormRegistrarse: () => void;
+}
+
+const MIN_LOGIN_WAIT_MS = 450;
+const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+export default function FormLogin({ mostrarFormRegistrarse }: FormLoginProps) {
     const [pedirCodigo, setPedirCodigo] = useState(false);
     const [dniIngresado, setDniIngresado] = useState<number | null>(null);
+    const [redirecting, setRedirecting] = useState(false);
 
     const {
         register,
         handleSubmit,
         setError,
-        formState: { errors },
+        formState: { errors, isSubmitting },
     } = useForm<Data>();
 
     const router = useRouter();
     const { setUserData } = useContext(UserContext);
+    const loading = isSubmitting || redirecting;
 
     const rolerouter = (rol: string) => {
         if (rol === "ADMIN") {
@@ -39,10 +47,13 @@ export default function FormLogin(props: any) {
 
     const onSubmit: SubmitHandler<Data> = async (data) => {
         //Llama a el backend para generar el login
-        const resp = await login({
-            dni: pedirCodigo ? dniIngresado : data.dni,
-            codigo: Number(data.codigo),
-        });
+        const [resp] = await Promise.all([
+            login({
+                dni: pedirCodigo ? dniIngresado : data.dni,
+                codigo: Number(data.codigo),
+            }),
+            wait(MIN_LOGIN_WAIT_MS),
+        ]);
 
         //Si hay un error de usuario no autorizado o usuario inexistente, muestra mensaje en pantalla
         if (resp === 404) {
@@ -70,6 +81,7 @@ export default function FormLogin(props: any) {
         }
 
         if (resp.step === 'LOGGED') {
+            setRedirecting(true);
             setUserData(resp.usuario);
             rolerouter(resp.usuario.rol);
         }
@@ -84,7 +96,7 @@ export default function FormLogin(props: any) {
 
             <form onSubmit={handleSubmit(onSubmit)} className="login-form d-flex flex-column my-3 d-grid gap-2 col-8 mx-auto">
                 {!pedirCodigo && (
-                    <input placeholder="DNI" type="number" className="btn-dni"
+                    <input placeholder="DNI" type="number" className="btn-dni" disabled={loading}
                         {...register("dni", {
                             required: "Por favor ingrese su DNI",
                             minLength: { value: 6, message: "Ingrese un numero de DNI valido" },
@@ -97,6 +109,7 @@ export default function FormLogin(props: any) {
                         placeholder="Código de acceso"
                         type="password"
                         className="btn-dni"
+                        disabled={loading}
                         {...register("codigo", {
                             required: "Ingrese el código",
                         })}
@@ -105,8 +118,17 @@ export default function FormLogin(props: any) {
                 {errors.dni && <small className="login-error">{errors.dni?.message}</small>}
                 {errors.codigo && <small className="login-error">{errors.codigo?.message}</small>}
 
-                <button type="submit" className="btn-style login-submit-btn" >Ingresar</button>
-                <small className="text-registrarse" onClick={() => mostrarFormRegistrarse()}>
+                {loading && (
+                    <div className="login-loading" role="status" aria-live="polite">
+                        <span className="login-spinner" aria-hidden="true" />
+                        <span>{redirecting ? 'Ingresando...' : pedirCodigo ? 'Validando codigo...' : 'Verificando DNI...'}</span>
+                    </div>
+                )}
+
+                <button type="submit" className="btn-style login-submit-btn" disabled={loading}>
+                    {loading ? 'Un momento...' : 'Ingresar'}
+                </button>
+                <small className={`text-registrarse ${loading ? 'disabled' : ''}`} onClick={() => !loading && mostrarFormRegistrarse()}>
                     <u className="text-registrarse">Aún no tenes una cuenta? Registrate</u>
                 </small>
             </form>

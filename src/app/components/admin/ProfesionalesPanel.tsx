@@ -250,6 +250,7 @@ export function ProfesionalesPanel({ profesionales, servicios, reloadAll }: Comm
       <AdminDataTable
         data={profesionales}
         columns={columns}
+        tableClassName="admin-professionals-table"
         searchPlaceholder="Buscar profesional"
         createLabel="Agregar profesional"
         isDeleted={(row) => Boolean(row.deletedAt)}

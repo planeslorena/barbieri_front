@@ -152,6 +152,7 @@ export function AgendaAdminPanel({
   servicios,
   clientes,
   reloadAll,
+  refreshKey,
   agendaApi = adminApi,
   hideProfessionalSelect = false,
 }: CommonPanelProps & {
@@ -216,6 +217,12 @@ export function AgendaAdminPanel({
   useEffect(() => {
     loadAgenda().catch((error) => Swal.fire('Error', apiMessage(error), 'error'));
   }, [selectedProfesional, weekStart, weekEnd]);
+
+  useEffect(() => {
+    if (!refreshKey) return;
+
+    loadAgenda().catch((error) => Swal.fire('Error', apiMessage(error), 'error'));
+  }, [refreshKey]);
 
   const slotStep = useMemo(() => {
     const durations = servicios
@@ -332,9 +339,11 @@ export function AgendaAdminPanel({
             ))}
           </select>
         )}
-        <button className="admin-icon-btn" onClick={() => moveWeek(-1)}><i className="bi bi-chevron-left" /></button>
-        <input className="form-control admin-date-input" type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
-        <button className="admin-icon-btn" onClick={() => moveWeek(1)}><i className="bi bi-chevron-right" /></button>
+        <div className="admin-week-nav">
+          <button className="admin-icon-btn" onClick={() => moveWeek(-1)}><i className="bi bi-chevron-left" /></button>
+          <input className="form-control admin-date-input" type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+          <button className="admin-icon-btn" onClick={() => moveWeek(1)}><i className="bi bi-chevron-right" /></button>
+        </div>
         <button className="btn-style admin-primary-btn ms-auto" onClick={() => setModal({ show: true, defaults: { fecha, id_profesional: selectedProfesional?.id_profesional } })}>Agregar turno</button>
       </div>
 

@@ -3,7 +3,7 @@
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ColumnDef } from '@tanstack/react-table';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { Resolver, useForm, useWatch } from 'react-hook-form';
 import Swal from 'sweetalert2';
@@ -58,6 +58,7 @@ const bloqueoSchema = yup.object({
 export function BloqueosPanel({
   profesionales,
   reloadAll,
+  refreshKey,
   bloqueosApi = adminApi,
   hideProfessionalSelect = false,
 }: CommonPanelProps & {
@@ -67,13 +68,19 @@ export function BloqueosPanel({
   const [bloqueos, setBloqueos] = useState<BloqueoAdmin[]>([]);
   const [modal, setModal] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setBloqueos(await bloqueosApi.getBloqueos({ desde: today() }));
-  };
+  }, [bloqueosApi]);
 
   useEffect(() => {
     load().catch((error) => Swal.fire('Error', apiMessage(error), 'error'));
-  }, []);
+  }, [load]);
+
+  useEffect(() => {
+    if (!refreshKey) return;
+
+    load().catch((error) => Swal.fire('Error', apiMessage(error), 'error'));
+  }, [load, refreshKey]);
 
   const columns = useMemo<ColumnDef<BloqueoAdmin>[]>(
     () => [

@@ -30,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${cormorant.variable} ${montserrat.variable}`}>
+    <html lang="es" className={`${cormorant.variable} ${montserrat.variable}`} data-scroll-behavior="smooth">
       <head>
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"

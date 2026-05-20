@@ -27,7 +27,7 @@ export interface RegisterPayload {
   telefono: number;
   fecha_nacimiento: string;
   id_obra_social: number;
-  numero_obra_social: string;
+  numero_obra_social: string | null;
 }
 
 export interface ObraSocial {

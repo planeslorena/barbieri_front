@@ -1,5 +1,4 @@
 'use client'
-/* eslint-disable react-hooks/set-state-in-effect */
 
 import { useCallback, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
@@ -14,11 +13,23 @@ import { adminApi } from '@/app/services/admin';
 import type { CategoriaServicioAdmin, ClienteAdmin, ProfesionalAdmin, ServicioAdmin, UsuarioAdmin } from '@/app/types/admin';
 import './page.css';
 
+function getErrorMessage(error: unknown, fallback: string) {
+    return error instanceof Error ? error.message : fallback;
+}
+
+const AUTO_REFRESH_INTERVAL_MS = 15 * 60 * 1000;
+
+function canAutoRefreshPanel() {
+    return document.visibilityState === 'visible' && !document.querySelector('.modal.show');
+}
+
 const loadAdminResource = async <T,>(label: string, request: () => Promise<T>) => {
     try {
         return await request();
-    } catch (error: any) {
-        const status = error?.response?.status;
+    } catch (error: unknown) {
+        const status = typeof error === 'object' && error !== null && 'response' in error
+            ? (error.response as { status?: number })?.status
+            : undefined;
         const detail = status ? `${label} (${status})` : label;
         throw new Error(`No se pudieron cargar: ${detail}`);
     }
@@ -27,6 +38,8 @@ const loadAdminResource = async <T,>(label: string, request: () => Promise<T>) =
 export default function Admin() {
     const [activeTab, setActiveTab] = useState('agenda');
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
     const [profesionales, setProfesionales] = useState<ProfesionalAdmin[]>([]);
     const [servicios, setServicios] = useState<ServicioAdmin[]>([]);
     const [categorias, setCategorias] = useState<CategoriaServicioAdmin[]>([]);
@@ -55,6 +68,30 @@ export default function Admin() {
             .finally(() => setLoading(false));
     }, [reloadAll]);
 
+    const handleRefresh = useCallback(async () => {
+        if (refreshing) return;
+
+        setRefreshing(true);
+        try {
+            await reloadAll();
+            setRefreshKey((current) => current + 1);
+        } catch (error: unknown) {
+            Swal.fire('Error', getErrorMessage(error, 'No se pudieron actualizar los datos.'), 'error');
+        } finally {
+            setRefreshing(false);
+        }
+    }, [refreshing, reloadAll]);
+
+    useEffect(() => {
+        const intervalId = window.setInterval(() => {
+            if (loading || refreshing || !canAutoRefreshPanel()) return;
+
+            void handleRefresh();
+        }, AUTO_REFRESH_INTERVAL_MS);
+
+        return () => window.clearInterval(intervalId);
+    }, [handleRefresh, loading, refreshing]);
+
     const commonProps = {
         profesionales,
         servicios,
@@ -62,6 +99,7 @@ export default function Admin() {
         clientes,
         administradores,
         reloadAll,
+        refreshKey,
     };
 
     return (
@@ -97,10 +135,11 @@ export default function Admin() {
                         </div>
                         <button
                             type="button"
-                            className="admin-icon-btn admin-refresh-btn"
-                            onClick={reloadAll}
+                            className={`admin-icon-btn admin-refresh-btn ${refreshing ? 'is-refreshing' : ''}`}
+                            onClick={handleRefresh}
+                            disabled={refreshing}
                             aria-label="Actualizar datos"
-                            title="Actualizar datos"
+                            title={refreshing ? 'Actualizando...' : 'Actualizar datos'}
                         >
                             <i className="bi bi-arrow-clockwise" />
                         </button>

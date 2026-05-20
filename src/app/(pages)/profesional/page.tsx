@@ -13,9 +13,17 @@ import { profesionalApi } from '@/app/services/profesional';
 import type { ClienteAdmin, ProfesionalAdmin } from '@/app/types/admin';
 import '../admin/page.css';
 
+const AUTO_REFRESH_INTERVAL_MS = 15 * 60 * 1000;
+
+function canAutoRefreshPanel() {
+  return document.visibilityState === 'visible' && !document.querySelector('.modal.show');
+}
+
 export default function ProfesionalPage() {
   const [activeTab, setActiveTab] = useState('agenda');
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [profesional, setProfesional] = useState<ProfesionalAdmin | null>(null);
   const [pacientes, setPacientes] = useState<ClienteAdmin[]>([]);
 
@@ -35,6 +43,30 @@ export default function ProfesionalPage() {
       .finally(() => setLoading(false));
   }, [reloadAll]);
 
+  const handleRefresh = useCallback(async () => {
+    if (refreshing) return;
+
+    setRefreshing(true);
+    try {
+      await reloadAll();
+      setRefreshKey((current) => current + 1);
+    } catch (error) {
+      Swal.fire('Error', apiMessage(error), 'error');
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refreshing, reloadAll]);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      if (loading || refreshing || !canAutoRefreshPanel()) return;
+
+      void handleRefresh();
+    }, AUTO_REFRESH_INTERVAL_MS);
+
+    return () => window.clearInterval(intervalId);
+  }, [handleRefresh, loading, refreshing]);
+
   const servicios = profesional?.servicios || [];
   const profesionales = profesional ? [profesional] : [];
   const commonProps = {
@@ -44,6 +76,7 @@ export default function ProfesionalPage() {
     clientes: pacientes,
     administradores: [],
     reloadAll,
+    refreshKey,
   };
   const agendaApi = {
     getTurnos: ({ desde, hasta }: { desde: string; hasta: string; id_profesional?: number }) =>
@@ -93,10 +126,11 @@ export default function ProfesionalPage() {
             </div>
             <button
               type="button"
-              className="admin-icon-btn admin-refresh-btn"
-              onClick={reloadAll}
+              className={`admin-icon-btn admin-refresh-btn ${refreshing ? 'is-refreshing' : ''}`}
+              onClick={handleRefresh}
+              disabled={refreshing}
               aria-label="Actualizar datos"
-              title="Actualizar datos"
+              title={refreshing ? 'Actualizando...' : 'Actualizar datos'}
             >
               <i className="bi bi-arrow-clockwise" />
             </button>
